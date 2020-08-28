@@ -1,0 +1,72 @@
+body {
+  font-family: Courier;
+  font-size: 25px;
+}
+
+span {
+  position: relative;
+}
+
+.renderText {
+  border: 0;
+  margin: 10vh auto 0 auto;
+  display: block;
+  font-size: 30px;
+  width: 70vw;
+  height: calc((70vw / 100) * 45);
+  max-width: 1000px;
+  padding: 10px 15px;
+  color: gray;
+}
+
+.input {
+  padding: 10px 15px;
+  margin: 10vh auto 0 auto;
+  display: block;
+  font-size: 20px;
+  width: 60vw;
+  max-width: 1000px;
+}
+
+.error {
+  color: red !important;
+}
+
+.success {
+  color: black !important;
+}
+
+.active {
+  color: white;
+  animation: blink 600ms steps(1, start) infinite;
+}
+
+.isSpace.success:before {
+  color: black;
+}
+.isSpace:before {
+  content: '␣';
+  position: absolute;
+  bottom: 2px;
+  color: gray;
+  opacity: 0.3;
+}
+
+.info ul{
+  list-style-type: none;
+}
+
+@keyframes blink {
+  0% {
+    background-color: transparent;
+    color: black;
+  }
+  50% {
+    background-color: black;
+    color: white;
+  }
+  100% {
+    background-color: transparent;
+    color: black;
+  }
+}
