@@ -1,31 +1,66 @@
-body {
+* {
+  margin: 0;
+  padding: 0;
   font-family: Courier;
-  font-size: 25px;
 }
 
-span {
-  position: relative;
+body {
+  font-size: 16px;
+  padding-top: 15px;
+}
+
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  font-size: 16px;
+}
+
+th, td {
+  padding: 5px;
 }
 
 .renderText {
   border: 0;
-  margin: 10vh auto 0 auto;
+  margin: 50px auto 15px auto;
   display: block;
   font-size: 30px;
-  width: 70vw;
-  height: calc((70vw / 100) * 45);
-  max-width: 1000px;
-  padding: 10px 15px;
+  line-height: 1.2em;
+  width: 80vw;
+  height: auto;
+  max-width: 800px;
   color: gray;
 }
 
-.input {
-  padding: 10px 15px;
-  margin: 10vh auto 0 auto;
+.renderText span {
+  position: relative;
+}
+
+.renderText.disableTyping .active {
+  animation: none;
+  color: gray;
+}
+
+.apply,
+.toogleTyping {
+  border: 1px solid black;
+  background: #fff;
+  border-radius: 3px;
+  padding: 5px 10px;
+  margin: 0 auto;
   display: block;
   font-size: 20px;
-  width: 60vw;
-  max-width: 1000px;
+  outline: 0;
+  cursor: pointer;
+}
+
+.textArea {
+  padding: 10px 15px;
+  margin: 50px auto 15px auto;
+  display: block;
+  font-size: 20px;
+  width: 80vw;
+  max-width: 800px;
+  box-sizing: border-box;
 }
 
 .error {
@@ -37,12 +72,15 @@ span {
 }
 
 .active {
-  color: white;
   animation: blink 600ms steps(1, start) infinite;
 }
 
 .isSpace.success:before {
   color: black;
+}
+.isSpace.error:before {
+  color: red;
+  opacity: 1;
 }
 .isSpace:before {
   content: '␣';
@@ -52,14 +90,21 @@ span {
   opacity: 0.3;
 }
 
+.info {
+  margin: 0 auto;
+  border: 1px solid black;
+}
 .info ul{
   list-style-type: none;
+}
+.info li{
+  display: inline-block;
 }
 
 @keyframes blink {
   0% {
     background-color: transparent;
-    color: black;
+    color: gray;
   }
   50% {
     background-color: black;
@@ -67,6 +112,6 @@ span {
   }
   100% {
     background-color: transparent;
-    color: black;
+    color: gray;
   }
 }

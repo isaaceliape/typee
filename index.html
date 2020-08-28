@@ -8,13 +8,19 @@
   <script src="app.js"></script>
 </head>
 <body>
-  <div class="info">
-    <ul>
-      <li>Number of words: <span class="numberOfWords">0</span></li>
-      <li>Errors: <span class="numberOfError">0</span></li>
-    </ul>
-  </div>
-  <div class="renderText"></div>
-  <textarea class="input" rows="4" cols="50">at wschools you will learn how to make a website they offer free tutorials in all web development technologies at wschools you will learn how to make a website they offer free tutorials in all web development technologies at wschools you will learn how to make a website they offer free tutorials in all web development technologies at wschools you will learn how to make a website they offer free tutorials in all web development technologies</textarea>
+  <table class="info">
+    <tr>
+      <th>Words</td>
+      <th>Errors</td>
+    </tr>
+    <tr>
+      <td><span class="numberOfWords">0</span></td>
+      <td><span class="numberOfError">0</span></td>
+    </tr>
+  </table>
+  <div class="renderText disableTyping"></div>
+  <button class="toogleTyping">Start typing</button>
+  <textarea class="textArea" rows="4" cols="50">the indefinite article takes two forms it's the word a when it precedes a word that begins with a consonant it's the word an when it precedes a word that begins with a vowel the indefinite article indicates that a noun refers to a general idea rather than a particular thing for example, you might ask your friend, “should i bring a gift to the party?” your friend will understand that you are not asking about a specific type of gift or a specific item “i am going to bring an apple pie,” your friend tells you</textarea>
+  <button class="apply">Apply</button>
 </body>
 </html>
