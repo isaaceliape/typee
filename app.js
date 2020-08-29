@@ -6,17 +6,26 @@ function onKeyup(e){
   const isFinished = this.currentPos > this.letters.length;
   if(isInvalidKey || isFinished) return;
   
-  if (key === 'Backspace') {
-    this.letters[this.currentPos].status = 'ok';
-    this.currentPos = this.currentPos - 1 >= 0
-      ? this.currentPos - 1
-      : 0;
-  } else if (this.letters[this.currentPos].text === key) {
-    this.letters[this.currentPos].status = 'success';
-    this.currentPos += 1;
-  } else {
-    this.letters[this.currentPos].status = 'error';
-    this.errorCount += 1;
+  switch (key) {
+    case 'Backspace':
+      this.letters[this.currentPos].status = 'ok';
+      this.currentPos = this.currentPos - 1 >= 0
+        ? this.currentPos - 1
+        : 0;
+      break;
+    case 'Escape':
+      this.reset();
+      break;
+
+    case this.letters[this.currentPos].text:
+      this.letters[this.currentPos].status = 'success';
+      this.currentPos += 1;
+      break;
+  
+    default:
+      this.letters[this.currentPos].status = 'error';
+      this.errorCount += 1;
+      break;
   }
 
   this.letters = this.letters.map(x => ({...x, active: false}));
@@ -40,12 +49,21 @@ function sanitizeText() {
   this.letters = Array.from(this.textArea.value).map( (text, i) => {
     let type = text === ' '? 'space' : '';
     return {
-      text,
+      text: text.toLowerCase(),
       status: 'ok',
       active: i === 0,
       type,
     };
   });
+}
+
+function reset() {
+  this.letters = this.letters.map(x => ({
+    ...x,
+    status: 'ok',
+    active: false,
+  }));
+  this.currentPos = 0;
 }
 
 function upadateInfos() {
@@ -80,7 +98,7 @@ function onClickToogleTyping() {
 }
 
 function init() {
-  this.allowedKeys = ['Backspace','\'','.',' ','q','w','e','r','t','y','u','i','o','p','a','s','d','f','g','h','j','k','l','z','x','c','v','b','n','m'];
+  this.allowedKeys = ['Escape','Backspace','\'','.',',',' ','q','w','e','r','t','y','u','i','o','p','a','s','d','f','g','h','j','k','l','z','x','c','v','b','n','m'];
   this.currentPos = 0;
   this.errorCount = 0;
   this.applyEl = document.querySelector('.apply');
@@ -93,6 +111,7 @@ function init() {
   this.disableTyping = true;
   
   // Binding
+  this.reset = reset.bind(this);
   this.onKeyup = onKeyup.bind(this);
   this.sanitizeText = sanitizeText.bind(this);
   this.upadateInfos = upadateInfos.bind(this);
