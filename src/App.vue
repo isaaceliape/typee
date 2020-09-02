@@ -1,27 +1,18 @@
 <template>
   <div id="app">
-    <table class="info">
-      <tr>
-        <th>Words</th>
-        <th>Errors</th>
-      </tr>
-      <tr>
-        <td><span class="numberOfWords">0</span></td>
-        <td><span class="numberOfError">0</span></td>
-      </tr>
-    </table>
-    <TextRenderer
-      ref="TextRenderer"
-      :letters="letters"
-    />
-    <button class="toogleTyping">Start typing</button>
+    <TextRenderer :letters="letters"/>
     <textarea
+      v-model="text"
       class="textArea"
       rows="4"
       cols="50"
-      :value="text"
     />
-    <button class="apply">Apply</button>
+    <button
+      class="apply"
+      @click="sanitizeText"
+    >
+      Apply
+    </button>
   </div>
 </template>
 
@@ -41,19 +32,13 @@ export default {
       text: MOCK_DATA,
     }
   },
+  mounted() {
+    this.sanitizeText();
+  },
   methods: {
-    render() {
-      this.renderTextEl.innerHTML = this.letters
-        .map(({ text, status, active, type }) => {
-          const activeClass = active ? ' active' : ''
-          const typeClass = type === 'space' ? ' isSpace' : ''
-          return `<span class='${status}${activeClass}${typeClass}'>${text}</span>`;
-        })
-        .join('');
-    },
     sanitizeText() {
-      this.letters = Array.from(this.textArea.value).map( (text, i) => {
-        let type = text === ' '? 'space' : '';
+      this.letters = Array.from(this.text).map((text, i) => {
+        let type = text === ' ' ? 'space' : '';
         return {
           text: text.toLowerCase(),
           status: 'ok',
@@ -88,8 +73,7 @@ export default {
     padding: 5px;
   }
 
-  .apply,
-  .toogleTyping {
+  .apply {
     border: 1px solid black;
     background: #fff;
     border-radius: 3px;
@@ -109,59 +93,6 @@ export default {
     width: 80vw;
     max-width: 800px;
     box-sizing: border-box;
-  }
-
-  .error {
-    color: red !important;
-  }
-
-  .success {
-    color: black !important;
-  }
-
-  .active {
-    animation: blink 600ms steps(1, start) infinite;
-  }
-
-  .isSpace.success:before {
-    color: black;
-  }
-  .isSpace.error:before {
-    color: red;
-    opacity: 1;
-  }
-  .isSpace:before {
-    content: '␣';
-    position: absolute;
-    bottom: 2px;
-    color: gray;
-    opacity: 0.3;
-  }
-
-  .info {
-    margin: 0 auto;
-    border: 1px solid black;
-  }
-  .info ul{
-    list-style-type: none;
-  }
-  .info li{
-    display: inline-block;
-  }
-
-  @keyframes blink {
-    0% {
-      background-color: transparent;
-      color: gray;
-    }
-    50% {
-      background-color: black;
-      color: white;
-    }
-    100% {
-      background-color: transparent;
-      color: gray;
-    }
   }
 
 </style>
