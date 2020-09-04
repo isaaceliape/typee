@@ -34,6 +34,7 @@ export default {
   },
   mounted() {
     this.sanitizeText();
+    console.log('Ready! =]');
   },
   methods: {
     sanitizeText() {
