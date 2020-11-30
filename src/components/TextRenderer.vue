@@ -51,7 +51,7 @@ export default {
   },
   data() {
     return {
-      allowedKeys: ['Escape','Backspace','\'','.',',',' ','q','w','e','r','t','y','u','i','o','p','a','s','d','f','g','h','j','k','l','z','x','c','v','b','n','m','Q','W','E','R','T','Y','U','I','O','P','A','S','D','F','G','H','J','K','L','Z','X','C','V','B','N','M'],
+      notAllowedKeys: ['Shift','Control','Alt','Meta','CapsLock','Tab','Enter','ArrowLeft','ArrowDown','ArrowRight'],
       currentPos: 0,
       errorCount: 0,
       disableTyping: true,
@@ -91,7 +91,7 @@ export default {
     },
     onKeyup(e){
       const key = e.key;
-      const isInvalidKey = !this.allowedKeys.includes(key);
+      const isInvalidKey = this.notAllowedKeys.includes(key);
       const isFinished = this.currentPos > this.letters.length;
       if(isInvalidKey || isFinished) return;
       
