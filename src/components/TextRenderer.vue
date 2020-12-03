@@ -1,27 +1,22 @@
 <template>
   <div class="TextRenderer">
-    <table class="info">
-      <tr>
-        <th>Words</th>
-        <th>Errors</th>
-      </tr>
-      <tr>
-        <td><span class="numberOfWords">0</span></td>
-        <td><span class="numberOfError">{{ errorCount }}</span></td>
-      </tr>
-    </table>
+    <InfoPanel
+      :words="wordsCount"
+      :errors="errorCount"
+    />
     <h1 class="articleTitle">{{ articleTitle }}</h1>
-    <div
-      ref="renderer"
-      class="renderer"
-      :class="{ disableTyping }"
-    >
-      <span
-        v-for="({ text, status, active, type }, index) in letters"
-        :key="index"
-        class="letter"
-        :class="[{ active }, status, type]"
-      >{{ text }}</span>
+    <div class="wrap-visualization">
+      <textarea
+        ref="renderer"
+        class="renderer"
+        :class="{ disableTyping }"
+        v-model="value"
+      />
+      <div
+        ref="visualization"
+        class="visualization"
+        v-html="finalText"
+      />
     </div>
     <button
       class="toogleTyping"
@@ -33,8 +28,12 @@
 </template>
 
 <script>
+import InfoPanel from './InfoPanel.vue';
+
 export default {
-  name: 'TextRenderer',
+  components: {
+    InfoPanel,
+  },
   props: {
     articleTitle: {
       type: String,
@@ -55,6 +54,33 @@ export default {
       currentPos: 0,
       errorCount: 0,
       disableTyping: true,
+      value: '',
+      finalText: '<span class="active">&nbsp;</span>',
+    }
+  },
+  watch: {
+    value(currentText) {
+      let analizedText = [];
+      const parsedCurrentText = currentText.replace(/ /g, '␣');
+      const parsedRawText = this.rawText.replace(/ /g, '␣');
+      for (let i = 0; i < parsedRawText.length; i++) {
+        const currPosText = parsedCurrentText[i];
+        const currPosRawText = parsedRawText[i];
+        const classes = ['letter'];
+
+        if (i === parsedCurrentText.length) classes.push('active');
+        if(typeof currPosText !== 'undefined') {
+          if (currPosText !== currPosRawText) {
+            classes.push('error');
+          } else {
+            classes.push('success');
+          }
+        }
+        if (currPosRawText === '␣') classes.push('space');
+        const finalLetter = `<span class="${classes.join(' ')}">${currPosRawText}</span>`;
+        analizedText.push(finalLetter);
+      }
+      this.finalText = analizedText.join('')
     }
   },
   computed: {
@@ -78,56 +104,14 @@ export default {
     onClickToogleTyping() {
       this.disableTyping = !this.disableTyping;
 
-      const listener = this.disableTyping
-        ? 'removeEventListener'
-        : 'addEventListener';
-
-      document[listener]('keyup', this.onKeyup);
-      document[listener]('keydown', this.onKeydown);
-
       if (this.disableTyping){
         this.$refs.renderer.focus();
       }
     },
-    onKeyup(e){
-      const key = e.key;
-      const isInvalidKey = this.notAllowedKeys.includes(key);
-      const isFinished = this.currentPos > this.letters.length;
-      if(isInvalidKey || isFinished) return;
-      
-      switch (key) {
-        case 'Backspace':
-          this.letters[this.currentPos].status = 'ok';
-          this.currentPos = this.currentPos - 1 >= 0
-            ? this.currentPos - 1
-            : 0;
-          break;
-        case 'Escape':
-          this.reset();
-          break;
-
-        case this.letters[this.currentPos].text:
-          this.letters[this.currentPos].status = 'success';
-          this.currentPos += 1;
-          break;
-      
-        default:
-          this.letters[this.currentPos].status = 'error';
-          this.errorCount += 1;
-          break;
-      }
-      
-      this.letters.forEach((x, i) => {
-        this.letters[i].active = this.currentPos === i;
-      });
-    },
-    onKeydown(e) {
-      if (e.code === 'Space') e.preventDefault();
-    },
   },
 }
 </script>
-<style scoped>
+<style lang="scss">
 
   body {
     font-size: 16px;
@@ -144,32 +128,56 @@ export default {
     padding: 5px;
   }
 
-  .renderer {
-    border: 0;
-    margin: 50px auto 15px auto;
-    display: block;
-    font-size: 30px;
-    line-height: 1.2em;
+  .wrap-visualization {
+    position: relative;
     width: 80vw;
     height: auto;
     max-width: 800px;
+    margin: 50px auto 15px auto;
+    overflow: hidden;
+  }
+  .renderer,
+  .visualization {
+    border: 0;
+    display: block;
+    font-size: 30px;
+    line-height: 1.2em;
+    width: 100%;
     color: gray;
+    border: 1px solid red;
+    box-sizing: border-box;
+  }
+  .renderer {
+    position: absolute;
+    opacity: 0;
+  }
+  .visualization {
+    outline: 1px solid green;
+    pointer-events: none;
+    color: black;
+    position: relative;
+    z-index: 1;
+  
+    .error {
+      color: red;
+    }
   }
 
   .letter {
     position: relative;
+    display: inline-block;
   }
 
-  .renderer.disableTyping,
-  .renderer.disableTyping .active,
-  .renderer.disableTyping .success,
-  .renderer.disableTyping .letter.active.space {
+  .visualization.disableTyping,
+  .visualization.disableTyping .active,
+  .visualization.disableTyping .success,
+  .visualization.disableTyping .letter.active.space {
     animation: none;
     color: rgb(211, 211, 211);
   }
 
   .success {
-    color: black;
+    color: gray;
   }
 
   .active {
@@ -190,23 +198,9 @@ export default {
   .space.success:before {
     color: black;
   }
-  .space:before {
-    content: '␣';
-    position: absolute;
-    bottom: 2px;
+  .space {
     color: gray;
     opacity: 0.3;
-  }
-
-  .info {
-    margin: 0 auto;
-    border: 1px solid black;
-  }
-  .info ul{
-    list-style-type: none;
-  }
-  .info li{
-    display: inline-block;
   }
 
   .articleTitle {

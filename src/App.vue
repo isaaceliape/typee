@@ -3,6 +3,7 @@
     <TextRenderer
       :letters="letters"
       :article-title="articleTitle"
+      :rawText="text"
     />
     <textarea
       v-model="text"
