@@ -3,18 +3,27 @@
     <InfoPanel
       :words="wordsCount"
       :errors="errorCount"
+      :font-size="fontSize"
+      @changeFontSize="onChangeFontSize"
     />
     <h1 class="articleTitle">{{ articleTitle }}</h1>
-    <div class="wrap-visualization">
-      <textarea
-        ref="renderer"
-        class="renderer"
-        :class="{ disableTyping }"
+    <div
+      ref="wrapViewer"
+      class="wrapViewer"
+      :class="disableTypingClass"
+    >
+      <input
+        ref="userInput"
+        class="userInput"
+        disabled="disabled"
+        autofocus
         v-model="value"
+        @keydown="preventNotAllowedKeys"
       />
       <div
-        ref="visualization"
-        class="visualization"
+        ref="viewer"
+        class="viewer"
+        :style="{fontSize: `${fontSize}px`}"
         v-html="finalText"
       />
     </div>
@@ -24,88 +33,137 @@
     >
       {{ toogleTypingBtnText }}
     </button>
+    <textarea
+      ref="customText"
+      v-model="sourceText"
+      class="customText"
+      :class="disableCustomText"
+      rows="4"
+      cols="50"
+    />
   </div>
 </template>
 
 <script>
+// import api from './api.js';
+import Cookies from 'js-cookie';
+
 import InfoPanel from './InfoPanel.vue';
+
+const mock_data = 'Amelia Krales A global phishing campaign has been targeting organizations associated with the distribution of COVID-19 vaccines since September 2020, IBM security researchers say.In a blog post, analysts Claire Zaboeva and Melissa';
+const NOT_ALLOWED_KEYS = ['ArrowLeft','ArrowRight','Tab'];
 
 export default {
   components: {
     InfoPanel,
   },
-  props: {
-    articleTitle: {
-      type: String,
-      default: '',
-    },
-    rawText: {
-      type: String,
-      default: '',
-    },
-    letters: {
-      type: Array,
-      default: () => ['a'],
-    },
-  },
   data() {
     return {
-      notAllowedKeys: ['Shift','Control','Alt','Meta','CapsLock','Tab','Enter','ArrowLeft','ArrowDown','ArrowRight'],
       currentPos: 0,
       errorCount: 0,
+      wordsCount: 0,
       disableTyping: true,
       value: '',
       finalText: '<span class="active">&nbsp;</span>',
+      sourceText: mock_data,
+      article: '',
+      articleTitle: 'Amelia KralesA global phishing',
+      fontSize: parseInt(Cookies.get('currentFontSize')) || 24,
     }
   },
   watch: {
     value(currentText) {
-      let analizedText = [];
-      const parsedCurrentText = currentText.replace(/ /g, '␣');
-      const parsedRawText = this.rawText.replace(/ /g, '␣');
-      for (let i = 0; i < parsedRawText.length; i++) {
-        const currPosText = parsedCurrentText[i];
-        const currPosRawText = parsedRawText[i];
-        const classes = ['letter'];
-
-        if (i === parsedCurrentText.length) classes.push('active');
-        if(typeof currPosText !== 'undefined') {
-          if (currPosText !== currPosRawText) {
-            classes.push('error');
-          } else {
-            classes.push('success');
-          }
-        }
-        if (currPosRawText === '␣') classes.push('space');
-        const finalLetter = `<span class="${classes.join(' ')}">${currPosRawText}</span>`;
-        analizedText.push(finalLetter);
-      }
-      this.finalText = analizedText.join('')
+      this.updateViewer(currentText);
     }
   },
   computed: {
-    wordsCount() {
-      return this.rawText.substr(0, this.currentPos).split(' ').length - 1;
-    },
     toogleTypingBtnText(){
       return this.disableTyping
         ? 'Click here to start typing'
-        : 'Click here stop typing';
-    }
+        : 'Click here to stop typing';
+    },
+    disableTypingClass() {
+      return this.disableTyping ? 'disabled' : '';
+    },
+    disableCustomText() {
+      return !this.disableTyping ? 'disabled' : ''
+    },
+  },
+  mounted(){
+    this.updateViewer(this.sourceText);
   },
   methods: {
-    reset() {
-      this.currentPos = 0;
-      this.letters.forEach((x, i) => {
-        this.letters[i].active = this.currentPos === i;
-        this.letters[i].status = 'ok';
-      });
+    incriseFontSize(increment) {
+      this.fontSize += increment;
+    },
+    decriseFontSize(decrement) {
+      this.fontSize -= decrement;
+    },
+    getErrorsCount(sourceText, currentText, currPosLetter) {
+      return sourceText[currPosLetter] !== currentText[currPosLetter]
+        ? this.errorCount + 1
+        : this.errorCount;
+    },
+    getWordsCount(parsedCurrentText, currPosLetter) {
+      return parsedCurrentText.substr(0, currPosLetter).split('␣').length - 1;
+    },
+    onChangeFontSize(method, value) {
+      const targetFocusEl = this.disableTyping ? 'customText' : 'userInput';
+      this[method](value);
+      this.$refs[targetFocusEl].focus();
+      this.updateWrapViewerHeight();
+      
+      Cookies.set('currentFontSize', this.fontSize, { expires: 365 });
+    },
+    updateViewer(currentText) {
+      let analizedText = [];
+      let currPosLetter = 0;
+      const parsedCurrentText = currentText.replace(/ /g, '␣');
+      const parsedSourceText = this.sourceText.replace(/ /g, '␣');
+
+      for (let i = 0; i < parsedSourceText.length; i++) {
+        const currPosText = parsedCurrentText[i];
+        const currPosSourceText = parsedSourceText[i];
+        const classes = ['letter'];
+
+        if (i === this.value.length) {
+          currPosLetter = i - 1;
+          classes.push('active')
+        }
+        if(typeof currPosText !== 'undefined') {
+          const status = currPosText !== currPosSourceText ? 'error' : 'success';
+          classes.push(status);
+        }
+        if (currPosSourceText === '␣') classes.push('space');
+        const finalLetter = `<span class="${classes.join(' ')}">${currPosSourceText}</span>`;
+        analizedText.push(finalLetter);
+      }
+      this.errorCount = this.getErrorsCount(parsedSourceText, parsedCurrentText, currPosLetter);
+      this.wordsCount = this.getWordsCount(parsedCurrentText, currPosLetter);
+      this.finalText = analizedText.join('');
+    },
+    preventNotAllowedKeys(e) {
+      if(NOT_ALLOWED_KEYS.includes(e.key)) e.preventDefault();
+    },
+    updateWrapViewerHeight() {
+      const { wrapViewer, viewer } = this.$refs;
+      setTimeout(() => {
+        const viewerHeight = viewer.getBoundingClientRect().height;
+        wrapViewer.style.height = `${viewerHeight}px`;
+      }, 200);
     },
     onClickToogleTyping() {
+      const { customText, wrapViewer, userInput } = this.$refs;
       this.disableTyping = !this.disableTyping;
 
-      if (this.disableTyping){
-        this.$refs.renderer.focus();
+      if(this.disableTyping) {
+        customText.focus();
+        wrapViewer.style.height = `0px`;
+      } else {
+        this.updateWrapViewerHeight();
+        userInput.removeAttribute('disabled');
+        userInput.focus();
+        this.updateViewer(this.sourceText);
       }
     },
   },
@@ -128,52 +186,73 @@ export default {
     padding: 5px;
   }
 
-  .wrap-visualization {
+  .wrapViewer {
     position: relative;
     width: 80vw;
-    height: auto;
     max-width: 800px;
     margin: 50px auto 15px auto;
     overflow: hidden;
+    transition: all .5s ease;
+    opacity: 1;
+    box-sizing: content-box;
+    padding-bottom: 40px;
+
+    &.disabled {
+      height: 0;
+      opacity: 0;
+    }
   }
-  .renderer,
-  .visualization {
+  .userInput,
+  .viewer {
     border: 0;
     display: block;
-    font-size: 30px;
     line-height: 1.2em;
     width: 100%;
-    color: gray;
-    border: 1px solid red;
+    color: black;
+    border: 1px solid black;
     box-sizing: border-box;
+    border-radius: 5px;
   }
-  .renderer {
-    position: absolute;
+
+  .userInput {
+    height: 0;
+    pointer-events: none;
     opacity: 0;
+    border: 0;
   }
-  .visualization {
+
+  .customText {
+    padding: 10px 15px;
+    margin: 50px auto 15px auto;
+    display: block;
+    font-size: 20px;
+    width: 80vw;
+    max-width: 800px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    font-size: 30px;
+    transition: all .5s ease;
+    height: 20vh;
+    opacity: 1;
+
+    &.disabled {
+      height: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
+  .viewer {
     outline: 1px solid green;
     pointer-events: none;
     color: black;
     position: relative;
     z-index: 1;
-  
-    .error {
-      color: red;
-    }
+    padding: 10px;
   }
 
   .letter {
     position: relative;
     display: inline-block;
-  }
-
-  .visualization.disableTyping,
-  .visualization.disableTyping .active,
-  .visualization.disableTyping .success,
-  .visualization.disableTyping .letter.active.space {
-    animation: none;
-    color: rgb(211, 211, 211);
   }
 
   .success {
@@ -206,6 +285,7 @@ export default {
   .articleTitle {
     max-width: 800px;
     margin: 25px auto 0 auto;
+    text-align: center;
   }
 
   .toogleTyping {
@@ -218,6 +298,11 @@ export default {
     font-size: 20px;
     outline: 0;
     cursor: pointer;
+    &:hover {
+      background-color: black;
+      color: white;
+      border-color: transparent;
+    }
   }
 
   @keyframes blink {
