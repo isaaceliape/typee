@@ -1,27 +1,31 @@
 <template>
   <div class="TextRenderer">
-    <table class="info">
-      <tr>
-        <th>Words</th>
-        <th>Errors</th>
-      </tr>
-      <tr>
-        <td><span class="numberOfWords">0</span></td>
-        <td><span class="numberOfError">{{ errorCount }}</span></td>
-      </tr>
-    </table>
+    <InfoPanel
+      :words="wordsCount"
+      :errors="errorCount"
+      :font-size="fontSize"
+      @changeFontSize="onChangeFontSize"
+    />
     <h1 class="articleTitle">{{ articleTitle }}</h1>
     <div
-      ref="renderer"
-      class="renderer"
-      :class="{ disableTyping }"
+      ref="wrapViewer"
+      class="wrapViewer"
+      :class="disableTypingClass"
     >
-      <span
-        v-for="({ text, status, active, type }, index) in letters"
-        :key="index"
-        class="letter"
-        :class="[{ active }, status, type]"
-      >{{ text }}</span>
+      <input
+        ref="userInput"
+        class="userInput"
+        disabled="disabled"
+        autofocus
+        v-model="value"
+        @keydown="preventNotAllowedKeys"
+      />
+      <div
+        ref="viewer"
+        class="viewer"
+        :style="{fontSize: `${fontSize}px`}"
+        v-html="finalText"
+      />
     </div>
     <button
       class="toogleTyping"
@@ -29,105 +33,143 @@
     >
       {{ toogleTypingBtnText }}
     </button>
+    <textarea
+      ref="customText"
+      v-model="sourceText"
+      class="customText"
+      :class="disableCustomText"
+      rows="4"
+      cols="50"
+    />
   </div>
 </template>
 
 <script>
+// import api from './api.js';
+import Cookies from 'js-cookie';
+
+import InfoPanel from './InfoPanel.vue';
+
+const mock_data = 'Amelia Krales A global phishing campaign has been targeting organizations associated with the distribution of COVID-19 vaccines since September 2020, IBM security researchers say.In a blog post, analysts Claire Zaboeva and Melissa';
+const NOT_ALLOWED_KEYS = ['ArrowLeft','ArrowRight','Tab'];
+
 export default {
-  name: 'TextRenderer',
-  props: {
-    articleTitle: {
-      type: String,
-      default: '',
-    },
-    rawText: {
-      type: String,
-      default: '',
-    },
-    letters: {
-      type: Array,
-      default: () => ['a'],
-    },
+  components: {
+    InfoPanel,
   },
   data() {
     return {
-      notAllowedKeys: ['Shift','Control','Alt','Meta','CapsLock','Tab','Enter','ArrowLeft','ArrowDown','ArrowRight'],
       currentPos: 0,
       errorCount: 0,
+      wordsCount: 0,
       disableTyping: true,
+      value: '',
+      finalText: '<span class="active">&nbsp;</span>',
+      sourceText: mock_data,
+      article: '',
+      articleTitle: 'Amelia KralesA global phishing',
+      fontSize: parseInt(Cookies.get('currentFontSize')) || 24,
+    }
+  },
+  watch: {
+    value(currentText) {
+      this.updateViewer(currentText);
     }
   },
   computed: {
-    wordsCount() {
-      return this.rawText.substr(0, this.currentPos).split(' ').length - 1;
-    },
     toogleTypingBtnText(){
       return this.disableTyping
         ? 'Click here to start typing'
-        : 'Click here stop typing';
-    }
+        : 'Click here to stop typing';
+    },
+    disableTypingClass() {
+      return this.disableTyping ? 'disabled' : '';
+    },
+    disableCustomText() {
+      return !this.disableTyping ? 'disabled' : ''
+    },
+  },
+  mounted(){
+    this.updateViewer(this.sourceText);
   },
   methods: {
-    reset() {
-      this.currentPos = 0;
-      this.letters.forEach((x, i) => {
-        this.letters[i].active = this.currentPos === i;
-        this.letters[i].status = 'ok';
-      });
+    incriseFontSize(increment) {
+      this.fontSize += increment;
+    },
+    decriseFontSize(decrement) {
+      this.fontSize -= decrement;
+    },
+    getErrorsCount(sourceText, currentText, currPosLetter) {
+      return sourceText[currPosLetter] !== currentText[currPosLetter]
+        ? this.errorCount + 1
+        : this.errorCount;
+    },
+    getWordsCount(parsedCurrentText, currPosLetter) {
+      return parsedCurrentText.substr(0, currPosLetter).split('␣').length - 1;
+    },
+    onChangeFontSize(method, value) {
+      const targetFocusEl = this.disableTyping ? 'customText' : 'userInput';
+      this[method](value);
+      this.$refs[targetFocusEl].focus();
+      this.updateWrapViewerHeight();
+      
+      Cookies.set('currentFontSize', this.fontSize, { expires: 365 });
+    },
+    updateViewer(currentText) {
+      let analizedText = [];
+      let currPosLetter = 0;
+      const parsedCurrentText = currentText.replace(/ /g, '␣');
+      const parsedSourceText = this.sourceText.replace(/ /g, '␣');
+
+      for (let i = 0; i < parsedSourceText.length; i++) {
+        const currPosText = parsedCurrentText[i];
+        const currPosSourceText = parsedSourceText[i];
+        const classes = ['letter'];
+
+        if (i === this.value.length) {
+          currPosLetter = i - 1;
+          classes.push('active')
+        }
+        if(typeof currPosText !== 'undefined') {
+          const status = currPosText !== currPosSourceText ? 'error' : 'success';
+          classes.push(status);
+        }
+        if (currPosSourceText === '␣') classes.push('space');
+        const finalLetter = `<span class="${classes.join(' ')}">${currPosSourceText}</span>`;
+        analizedText.push(finalLetter);
+      }
+      this.errorCount = this.getErrorsCount(parsedSourceText, parsedCurrentText, currPosLetter);
+      this.wordsCount = this.getWordsCount(parsedCurrentText, currPosLetter);
+      this.finalText = analizedText.join('');
+    },
+    preventNotAllowedKeys(e) {
+      if(NOT_ALLOWED_KEYS.includes(e.key)) e.preventDefault();
+    },
+    updateWrapViewerHeight() {
+      const { wrapViewer, viewer } = this.$refs;
+      setTimeout(() => {
+        const viewerHeight = viewer.getBoundingClientRect().height;
+        wrapViewer.style.height = `${viewerHeight}px`;
+      }, 200);
     },
     onClickToogleTyping() {
+      const { customText, wrapViewer, userInput } = this.$refs;
       this.disableTyping = !this.disableTyping;
 
-      const listener = this.disableTyping
-        ? 'removeEventListener'
-        : 'addEventListener';
-
-      document[listener]('keyup', this.onKeyup);
-      document[listener]('keydown', this.onKeydown);
-
-      if (this.disableTyping){
-        this.$refs.renderer.focus();
+      if(this.disableTyping) {
+        customText.focus();
+        wrapViewer.style.height = `0px`;
+      } else {
+        this.updateWrapViewerHeight();
+        userInput.removeAttribute('disabled');
+        userInput.focus();
+        this.updateViewer(this.sourceText);
       }
-    },
-    onKeyup(e){
-      const key = e.key;
-      const isInvalidKey = this.notAllowedKeys.includes(key);
-      const isFinished = this.currentPos > this.letters.length;
-      if(isInvalidKey || isFinished) return;
-      
-      switch (key) {
-        case 'Backspace':
-          this.letters[this.currentPos].status = 'ok';
-          this.currentPos = this.currentPos - 1 >= 0
-            ? this.currentPos - 1
-            : 0;
-          break;
-        case 'Escape':
-          this.reset();
-          break;
-
-        case this.letters[this.currentPos].text:
-          this.letters[this.currentPos].status = 'success';
-          this.currentPos += 1;
-          break;
-      
-        default:
-          this.letters[this.currentPos].status = 'error';
-          this.errorCount += 1;
-          break;
-      }
-      
-      this.letters.forEach((x, i) => {
-        this.letters[i].active = this.currentPos === i;
-      });
-    },
-    onKeydown(e) {
-      if (e.code === 'Space') e.preventDefault();
     },
   },
 }
 </script>
-<style scoped>
+<style lang="scss">
 
   body {
     font-size: 16px;
@@ -144,32 +186,77 @@ export default {
     padding: 5px;
   }
 
-  .renderer {
+  .wrapViewer {
+    position: relative;
+    width: 80vw;
+    max-width: 800px;
+    margin: 50px auto 15px auto;
+    overflow: hidden;
+    transition: all .5s ease;
+    opacity: 1;
+    box-sizing: content-box;
+    padding-bottom: 40px;
+
+    &.disabled {
+      height: 0;
+      opacity: 0;
+    }
+  }
+  .userInput,
+  .viewer {
     border: 0;
+    display: block;
+    line-height: 1.2em;
+    width: 100%;
+    color: black;
+    border: 1px solid black;
+    box-sizing: border-box;
+    border-radius: 5px;
+  }
+
+  .userInput {
+    height: 0;
+    pointer-events: none;
+    opacity: 0;
+    border: 0;
+  }
+
+  .customText {
+    padding: 10px 15px;
     margin: 50px auto 15px auto;
     display: block;
-    font-size: 30px;
-    line-height: 1.2em;
+    font-size: 20px;
     width: 80vw;
-    height: auto;
     max-width: 800px;
-    color: gray;
+    box-sizing: border-box;
+    border-radius: 5px;
+    font-size: 30px;
+    transition: all .5s ease;
+    height: 20vh;
+    opacity: 1;
+
+    &.disabled {
+      height: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
+  .viewer {
+    outline: 1px solid green;
+    pointer-events: none;
+    color: black;
+    position: relative;
+    z-index: 1;
+    padding: 10px;
   }
 
   .letter {
     position: relative;
-  }
-
-  .renderer.disableTyping,
-  .renderer.disableTyping .active,
-  .renderer.disableTyping .success,
-  .renderer.disableTyping .letter.active.space {
-    animation: none;
-    color: rgb(211, 211, 211);
+    display: inline-block;
   }
 
   .success {
-    color: black;
+    color: gray;
   }
 
   .active {
@@ -190,28 +277,15 @@ export default {
   .space.success:before {
     color: black;
   }
-  .space:before {
-    content: '␣';
-    position: absolute;
-    bottom: 2px;
+  .space {
     color: gray;
     opacity: 0.3;
-  }
-
-  .info {
-    margin: 0 auto;
-    border: 1px solid black;
-  }
-  .info ul{
-    list-style-type: none;
-  }
-  .info li{
-    display: inline-block;
   }
 
   .articleTitle {
     max-width: 800px;
     margin: 25px auto 0 auto;
+    text-align: center;
   }
 
   .toogleTyping {
@@ -224,6 +298,11 @@ export default {
     font-size: 20px;
     outline: 0;
     cursor: pointer;
+    &:hover {
+      background-color: black;
+      color: white;
+      border-color: transparent;
+    }
   }
 
   @keyframes blink {

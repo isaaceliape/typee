@@ -4,11 +4,13 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build --mode production && rsync -va dist/* . && rm -rf dist/",
+    "clear_assets": "sh bin/clear_assets.sh",
+    "build": "npm run clear_assets & vue-cli-service build --mode production && rsync -va dist/* . && rm -rf dist/",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
     "core-js": "^3.6.5",
+    "js-cookie": "^2.2.1",
     "vue": "^2.6.11",
     "xml2js": "^0.4.23"
   },
