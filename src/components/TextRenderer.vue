@@ -125,6 +125,7 @@ export default {
         const currPosText = parsedCurrentText[i];
         const currPosSourceText = parsedSourceText[i];
         const classes = ['letter'];
+        let finalText = currPosSourceText;
 
         if (i === this.value.length) {
           currPosLetter = i - 1;
@@ -132,10 +133,11 @@ export default {
         }
         if(typeof currPosText !== 'undefined') {
           const status = currPosText !== currPosSourceText ? 'error' : 'success';
+          finalText = currPosText;
           classes.push(status);
         }
         if (currPosSourceText === '␣') classes.push('space');
-        const finalLetter = `<span class="${classes.join(' ')}">${currPosSourceText}</span>`;
+        const finalLetter = `<span class="${classes.join(' ')}">${finalText}</span>`;
         analizedText.push(finalLetter);
       }
       this.errorCount = this.getErrorsCount(parsedSourceText, parsedCurrentText, currPosLetter);
@@ -253,33 +255,38 @@ export default {
   .letter {
     position: relative;
     display: inline-block;
-  }
 
-  .success {
-    color: gray;
-  }
+    &.success {
+      color: #80808063;
 
-  .active {
-    animation: blink 600ms steps(1, start) infinite;
-  }
+      &.space:before {
+        color: black;
+      }
+    }
+    &.error {
+      color: white;
+      background-color: red;
 
-  .letter.active.error {
-    animation: blinkError 600ms steps(1, start) infinite;
-  }
-  .letter.active.space.error:before {
-    color: red;
-    opacity: 1;
-  }
-  .letter.active.space {
-    animation: blink 600ms steps(1, start) infinite;
-  }
-
-  .space.success:before {
-    color: black;
-  }
-  .space {
-    color: gray;
-    opacity: 0.3;
+      &.space {
+        opacity: 1;
+      }
+    }
+    &.active {
+      &.space {
+        animation: blink 600ms steps(1, start) infinite;
+        &.error:before {
+          color: red;
+          opacity: 1;
+        }
+      }
+    }
+    &.active {
+      animation: blink 600ms steps(1, start) infinite;
+    }
+    &.space {
+      color: gray;
+      opacity: 0.3;
+    }
   }
 
   .articleTitle {
@@ -304,7 +311,6 @@ export default {
       border-color: transparent;
     }
   }
-
   @keyframes blink {
     0% {
       background-color: transparent;
@@ -317,20 +323,6 @@ export default {
     100% {
       background-color: transparent;
       color: gray;
-    }
-  }
-  @keyframes blinkError {
-    0% {
-      background-color: transparent;
-      color: red;
-    }
-    50% {
-      background-color: black;
-      color: red;
-    }
-    100% {
-      background-color: transparent;
-      color: red;
     }
   }
 </style>
