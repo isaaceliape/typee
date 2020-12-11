@@ -1,0 +1,10 @@
+{
+  "name": "Typing tool",
+  "short_name": "Typing tool",
+  "theme_color": "#ffffff",
+  "background_color": "#000000",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/"
+}
