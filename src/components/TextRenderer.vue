@@ -1,12 +1,12 @@
 <template>
   <div class="TextRenderer">
-    <InfoPanel
-      :words="wordsCount"
-      :errors="errorCount"
-      :font-size="fontSize"
-      @changeFontSize="onChangeFontSize"
-    />
-    <h1 class="articleTitle">{{ articleTitle }}</h1>
+    <InfoPanel />
+    <h1
+      v-if="!disableTyping && articleTitle.length"
+      class="articleTitle"
+    >
+      {{ articleTitle }}
+    </h1>
     <div
       ref="wrapViewer"
       class="wrapViewer"
@@ -38,6 +38,7 @@
       v-model="sourceText"
       class="customText"
       :class="disableCustomText"
+      :style="{fontSize: `${fontSize}px`, fontFamily: `${selectedFont}`}"
       rows="4"
       cols="50"
     />
@@ -46,7 +47,9 @@
 
 <script>
 // import api from './api.js';
-import Cookies from 'js-cookie';
+
+import { mapState } from 'vuex'
+import { mapMutations } from 'vuex'
 
 import InfoPanel from './InfoPanel.vue';
 
@@ -60,15 +63,12 @@ export default {
   data() {
     return {
       currentPos: 0,
-      errorCount: 0,
-      wordsCount: 0,
       disableTyping: true,
       value: '',
       finalText: '<span class="active">&nbsp;</span>',
       sourceText: mock_data,
       article: '',
-      articleTitle: 'Amelia KralesA global phishing',
-      fontSize: parseInt(Cookies.get('currentFontSize')) || 24,
+      articleTitle: '',
     }
   },
   watch: {
@@ -77,6 +77,12 @@ export default {
     }
   },
   computed: {
+    ...mapState([
+      'fontSize',
+      'errorCount',
+      'selectedFont',
+      'showCapitalLetters',
+    ]),
     toogleTypingBtnText(){
       return this.disableTyping
         ? 'Click here to start typing'
@@ -93,33 +99,23 @@ export default {
     this.updateViewer(this.sourceText);
   },
   methods: {
-    incriseFontSize(increment) {
-      this.fontSize += increment;
+    ...mapMutations([
+      'increaseErrorCount',
+      'setWordsCount',
+    ]),
+    updateErrorCount(sourceText, currentText, currPosLetter) {
+      if(sourceText[currPosLetter] !== currentText[currPosLetter]) this.increaseErrorCount();
     },
-    decriseFontSize(decrement) {
-      this.fontSize -= decrement;
-    },
-    getErrorsCount(sourceText, currentText, currPosLetter) {
-      return sourceText[currPosLetter] !== currentText[currPosLetter]
-        ? this.errorCount + 1
-        : this.errorCount;
-    },
-    getWordsCount(parsedCurrentText, currPosLetter) {
-      return parsedCurrentText.substr(0, currPosLetter).split('␣').length - 1;
-    },
-    onChangeFontSize(method, value) {
-      const targetFocusEl = this.disableTyping ? 'customText' : 'userInput';
-      this[method](value);
-      this.$refs[targetFocusEl].focus();
-      this.updateWrapViewerHeight();
-      
-      Cookies.set('currentFontSize', this.fontSize, { expires: 365 });
+    updateWordsCount(parsedCurrentText, currPosLetter) {
+      const count = parsedCurrentText.substr(0, currPosLetter).split('␣').length - 1;
+      this.setWordsCount(count);
     },
     updateViewer(currentText) {
       let analizedText = [];
       let currPosLetter = 0;
       const parsedCurrentText = currentText.replace(/ /g, '␣');
-      const parsedSourceText = this.sourceText.replace(/ /g, '␣');
+      let parsedSourceText = this.sourceText.replace(/ /g, '␣');
+      if(!this.showCapitalLetters) parsedSourceText = parsedSourceText.toLowerCase();
 
       for (let i = 0; i < parsedSourceText.length; i++) {
         const currPosText = parsedCurrentText[i];
@@ -140,8 +136,9 @@ export default {
         const finalLetter = `<span class="${classes.join(' ')}">${finalText}</span>`;
         analizedText.push(finalLetter);
       }
-      this.errorCount = this.getErrorsCount(parsedSourceText, parsedCurrentText, currPosLetter);
-      this.wordsCount = this.getWordsCount(parsedCurrentText, currPosLetter);
+      this.updateErrorCount(parsedSourceText, parsedCurrentText, currPosLetter);
+      this.updateWordsCount(parsedCurrentText, currPosLetter);
+
       this.finalText = analizedText.join('');
     },
     preventNotAllowedKeys(e) {
@@ -211,7 +208,6 @@ export default {
     line-height: 1.2em;
     width: 100%;
     color: black;
-    border: 1px solid black;
     box-sizing: border-box;
     border-radius: 5px;
   }
@@ -232,10 +228,10 @@ export default {
     max-width: 800px;
     box-sizing: border-box;
     border-radius: 5px;
-    font-size: 30px;
     transition: all .5s ease;
     height: 20vh;
     opacity: 1;
+    outline: none;
 
     &.disabled {
       height: 0;
@@ -244,7 +240,6 @@ export default {
     }
   }
   .viewer {
-    outline: 1px solid green;
     pointer-events: none;
     color: black;
     position: relative;
@@ -269,6 +264,7 @@ export default {
 
       &.space {
         opacity: 1;
+        color: white;
       }
     }
     &.active {

@@ -4,47 +4,26 @@
       <tr>
         <th>Words</th>
         <th>Errors</th>
-        <th>Text size</th>
       </tr>
       <tr>
-        <td><span class="words">{{ words }}</span></td>
-        <td><span class="errors">{{ errors }}</span></td>
-        <td class="fontSizeControler">
-          <span class="currentFontSize">{{ fontSize }}</span>
-          <button
-            class="fontSizeControlerButtons"
-            @click="() => this.$emit('changeFontSize', 'incriseFontSize', 1)"
-          >
-            +
-          </button>
-          <button
-            class="fontSizeControlerButtons"
-            @click="() => this.$emit('changeFontSize', 'decriseFontSize', 1)"
-          >
-            -
-          </button>
-        </td>
+        <td><span class="words">{{ wordsCount }}</span></td>
+        <td><span class="errors">{{ errorCount }}</span></td>
       </tr>
     </table>
   </div>
 </template>
 
 <script>
+import { mapState, mapMutations } from 'vuex'
+
 export default {
-  props: {
-    words: {
-      type: Number,
-      default: 0
-    },
-    errors: {
-      type: Number,
-      default: 0
-    },
-    fontSize: {
-      type: Number,
-      default: 0
-    },
-  },
+  computed: mapState([
+    'errorCount',
+    'fontSize',
+    'wordsCount',
+    'showCapitalLetters',
+  ]),
+  methods: mapMutations(['toggleCapitalLetters'])
 }
 </script>
 
@@ -60,21 +39,4 @@ export default {
   margin-bottom: 5px;
 }
 
-.fontSizeControlerButtons {
-  padding: 4px 8px;
-  margin-right: 5px;
-  border-radius: 5px;
-  background-color: transparent;
-  border: 1px solid;
-  vertical-align: middle;
-  cursor: pointer;
-  &:hover {
-    background-color: black;
-    color: white;
-    border-color: transparent;
-  }
-  &:last-child {
-    margin-right: 0;
-  }
-}
 </style>
