@@ -25,10 +25,8 @@ export default {
     ])
   },
   mounted() {
-    if(!this.selectedFont) {
-      this.setSelectedFont(this.fonts[1]);
-      helpers.updateSelectedFont(this.fonts[1]);
-    }
+    if(!this.selectedFont) this.setSelectedFont(this.fonts[1]);
+    helpers.updateSelectedFont(this.selectedFont);
   },
   methods: {
     ...mapMutations([
