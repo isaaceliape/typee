@@ -9,10 +9,10 @@ const store = {
     sourceText: '',
     article: '',
     menuOpen: false,
-    selectedFont: null,
+    selectedFont: `'Ubuntu Mono', monospace`,
     fonts: [
-      `'Ubuntu Mono', monospace`,
-      `'Roboto Mono', monospace`,
+      { text: 'Ubuntu', value: `'Ubuntu Mono', monospace` },
+      { text: 'Roboto', value: `'Roboto Mono', monospace` },
     ],
     articleTitle: 'Amelia KralesA global phishing',
     fontSize: 24,
@@ -21,6 +21,12 @@ const store = {
     toggleMenuOpen (state) {
       state.menuOpen = !state.menuOpen;
       console.log('state.menuOpen', state.menuOpen);
+    },
+    setMenuOpen (state, payload) {
+      state.menuOpen = payload;
+    },
+    setDisableTyping (state, payload) {
+      state.disableTyping = payload;
     },
     increaseErrorCount (state) {
       state.errorCount += 1;

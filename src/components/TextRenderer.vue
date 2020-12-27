@@ -23,7 +23,7 @@
       <div
         ref="viewer"
         class="viewer"
-        :style="{fontSize: `${fontSize}px`}"
+        :style="{fontSize: `${fontSize}px`, fontFamily: `${selectedFont}`}"
         v-html="finalText"
       />
     </div>
@@ -48,12 +48,11 @@
 <script>
 // import api from './api.js';
 
-import { mapState } from 'vuex'
-import { mapMutations } from 'vuex'
+import { mapState, mapMutations } from 'vuex'
 
 import InfoPanel from './InfoPanel.vue';
 
-const mock_data = 'Amelia Krales A global phishing campaign has been targeting organizations associated with the distribution of COVID-19 vaccines since September 2020, IBM security researchers say.In a blog post, analysts Claire Zaboeva and Melissa';
+const mock_data = 'Amelia Krales A global phishing campaign has been targeting organizations associated with the distribution of COVID-19 vaccines since September 2020, IBM security researchers say. In a blog post, analysts Claire Zaboeva and Melissa';
 const NOT_ALLOWED_KEYS = ['ArrowLeft','ArrowRight','Tab'];
 
 export default {
@@ -63,7 +62,6 @@ export default {
   data() {
     return {
       currentPos: 0,
-      disableTyping: true,
       value: '',
       finalText: '<span class="active">&nbsp;</span>',
       sourceText: mock_data,
@@ -81,6 +79,7 @@ export default {
       'fontSize',
       'errorCount',
       'selectedFont',
+      'disableTyping',
       'showCapitalLetters',
     ]),
     toogleTypingBtnText(){
@@ -100,8 +99,10 @@ export default {
   },
   methods: {
     ...mapMutations([
-      'increaseErrorCount',
+      'setMenuOpen',
       'setWordsCount',
+      'setDisableTyping',
+      'increaseErrorCount',
     ]),
     updateErrorCount(sourceText, currentText, currPosLetter) {
       if(sourceText[currPosLetter] !== currentText[currPosLetter]) this.increaseErrorCount();
@@ -116,7 +117,6 @@ export default {
       const parsedCurrentText = currentText.replace(/ /g, '␣');
       let parsedSourceText = this.sourceText.replace(/ /g, '␣');
       if(!this.showCapitalLetters) parsedSourceText = parsedSourceText.toLowerCase();
-
       for (let i = 0; i < parsedSourceText.length; i++) {
         const currPosText = parsedCurrentText[i];
         const currPosSourceText = parsedSourceText[i];
@@ -144,22 +144,14 @@ export default {
     preventNotAllowedKeys(e) {
       if(NOT_ALLOWED_KEYS.includes(e.key)) e.preventDefault();
     },
-    updateWrapViewerHeight() {
-      const { wrapViewer, viewer } = this.$refs;
-      setTimeout(() => {
-        const viewerHeight = viewer.getBoundingClientRect().height;
-        wrapViewer.style.height = `${viewerHeight}px`;
-      }, 200);
-    },
     onClickToogleTyping() {
-      const { customText, wrapViewer, userInput } = this.$refs;
-      this.disableTyping = !this.disableTyping;
+      const { customText, userInput } = this.$refs;
+      this.setDisableTyping(!this.disableTyping);
+      this.setMenuOpen(false);
 
       if(this.disableTyping) {
         customText.focus();
-        wrapViewer.style.height = `0px`;
       } else {
-        this.updateWrapViewerHeight();
         userInput.removeAttribute('disabled');
         userInput.focus();
         this.updateViewer(this.sourceText);

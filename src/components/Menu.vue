@@ -1,6 +1,6 @@
 <template>
   <div class="Menu">
-    <BurgerMenu @click="toggleMenuOpen" />
+    <BurgerMenu @click="onClickBurgerMenu" />
     <div
       class="content"
       :class="menuHiddenClass"
@@ -38,11 +38,12 @@
           <td>
             <select v-model="selectedFontValue">
               <option
-                v-for="value in fonts"
+                v-for="{ value, text } in fonts"
                 :key="value"
                 :value="value"
+                :selected="value === selectedFont ? 'selected' : false"
               >
-                {{value}}
+                {{text}}
               </option>
             </select>
           </td>
@@ -65,8 +66,13 @@ export default {
   },
   data() {
     return {
-      selectedFontValue: this.selectedFont,
+      selectedFontValue: `'Ubuntu Mono', monospace`,
     };
+  },
+  watch: {
+    selectedFontValue(value) {
+      this.setSelectedFont(value);
+    }
   },
   computed: {
     ...mapState([
@@ -74,6 +80,7 @@ export default {
       'fontSize',
       'menuOpen',
       'selectedFont',
+      'disableTyping',
       'showCapitalLetters',
     ]),
     menuHiddenClass() {
@@ -83,10 +90,16 @@ export default {
   methods: {
     ...mapMutations([
       'toggleMenuOpen',
+      'setSelectedFont',
       'increaseFontSize',
       'decreaseFontSize',
+      'setDisableTyping',
       'toggleCapitalLetters',
     ]),
+    onClickBurgerMenu() {
+      this.toggleMenuOpen();
+      if (!this.disableTyping) this.setDisableTyping(true);
+    }
   }
 }
 </script>
@@ -95,7 +108,7 @@ export default {
   td {
     white-space: nowrap;
   }
-  .menu {
+  .Menu {
     position: absolute;
     left: 0;
     top: 0;
@@ -103,7 +116,6 @@ export default {
   .content {
     transition: all 250ms ease;
     overflow: hidden;
-    width: 255px;
     &.hide {
       width: 0px;
     }
