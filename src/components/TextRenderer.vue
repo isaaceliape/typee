@@ -48,7 +48,7 @@
 <script>
 // import api from './api.js';
 import * as R from 'ramda';
-import { mapState, mapMutations } from 'vuex'
+import { mapState, mapMutations, mapGetters } from 'vuex'
 
 import InfoPanel from './InfoPanel.vue';
 
@@ -89,6 +89,9 @@ export default {
       'disableTyping',
       'wordsPerSentence',
       'showCapitalLetters',
+    ]),
+    ...mapGetters([
+      'getSentencesCount',
     ]),
     toogleTypingBtnText(){
       return this.disableTyping
@@ -161,9 +164,13 @@ export default {
       if(NOT_ALLOWED_KEYS.includes(e.key)) e.preventDefault();
     },
     updateCurrentSentence(targetPos) {
-      this.setSentencePos(targetPos);
-      this.setSentences(R.splitEvery(this.wordsPerSentence, this.sourceText.split(' ')).map(x => x.join(' ')));
-      this.currentSentence = this.sentences[this.sentencePos];
+      if (targetPos > this.getSentencesCount) {
+        console.log('DONE');
+      } else {
+        this.setSentencePos(targetPos);
+        this.setSentences(R.splitEvery(this.wordsPerSentence, this.sourceText.split(' ')).map(x => x.join(' ')));
+        this.currentSentence = this.sentences[this.sentencePos];
+      }
     },
     onClickToogleTyping() {
       const { customText, userInput } = this.$refs;
