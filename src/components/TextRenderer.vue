@@ -10,7 +10,7 @@
     <div
       ref="wrapViewer"
       class="wrapViewer"
-      :class="disableTypingClass"
+      :class="{ disabled: disableTyping }"
     >
       <input
         ref="userInput"
@@ -18,7 +18,7 @@
         disabled="disabled"
         autofocus
         v-model="value"
-        @keydown="preventNotAllowedKeys"
+        @keydown="onKeydownUserInput"
       />
       <div
         ref="viewer"
@@ -37,7 +37,7 @@
       ref="customText"
       v-model="sourceText"
       class="customText"
-      :class="disableCustomText"
+      :class="{disabled: !disableTyping}"
       :style="{fontSize: `${fontSize}px`, fontFamily: `${selectedFont}`}"
       rows="4"
       cols="50"
@@ -87,12 +87,6 @@ export default {
         ? 'Click here to start typing'
         : 'Click here to stop typing';
     },
-    disableTypingClass() {
-      return this.disableTyping ? 'disabled' : '';
-    },
-    disableCustomText() {
-      return !this.disableTyping ? 'disabled' : ''
-    },
   },
   mounted(){
     this.updateViewer(this.sourceText);
@@ -101,6 +95,7 @@ export default {
     ...mapMutations([
       'setMenuOpen',
       'setWordsCount',
+      'setErrorCount',
       'setDisableTyping',
       'increaseErrorCount',
     ]),
@@ -140,6 +135,16 @@ export default {
       this.updateWordsCount(parsedCurrentText, currPosLetter);
 
       this.finalText = analizedText.join('');
+    },
+    onKeydownUserInput(e) {
+      this.preventNotAllowedKeys(e);
+      if (e.key === 'Escape') this.resetTyping();
+    },
+    resetTyping() {
+      this.currentPos = 0;
+      this.value = '';
+      this.setErrorCount(0);
+      this.updateViewer(this.sourceText);
     },
     preventNotAllowedKeys(e) {
       if(NOT_ALLOWED_KEYS.includes(e.key)) e.preventDefault();

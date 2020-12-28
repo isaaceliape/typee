@@ -31,6 +31,9 @@ const store = {
     increaseErrorCount (state) {
       state.errorCount += 1;
     },
+    setErrorCount (state, payload) {
+      state.errorCount = payload;
+    },
     increaseFontSize (state) {
       state.fontSize += 1;
     },
