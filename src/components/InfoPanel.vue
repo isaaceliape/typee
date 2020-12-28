@@ -4,25 +4,34 @@
       <tr>
         <th>Words</th>
         <th>Errors</th>
+        <th>Sentences</th>
       </tr>
       <tr>
         <td><span class="words">{{ wordsCount }}</span></td>
         <td><span class="errors">{{ errorCount }}</span></td>
+        <td><span class="errors">{{ sentencePos + 1 }} of {{ getSentencesCount }}</span></td>
       </tr>
     </table>
   </div>
 </template>
 
 <script>
-import { mapState, mapMutations } from 'vuex'
+import { mapState, mapMutations, mapGetters } from 'vuex'
 
 export default {
-  computed: mapState([
-    'errorCount',
-    'fontSize',
-    'wordsCount',
-    'showCapitalLetters',
-  ]),
+  computed:{
+    ...mapState([
+      'errorCount',
+      'fontSize',
+      'sentences',
+      'wordsCount',
+      'sentencePos',
+      'showCapitalLetters',
+    ]),
+    ...mapGetters([
+      'getSentencesCount',
+    ]),
+  },
   methods: mapMutations(['toggleCapitalLetters'])
 }
 </script>

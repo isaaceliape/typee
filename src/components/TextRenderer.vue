@@ -47,8 +47,8 @@
 
 <script>
 // import api from './api.js';
-
-import { mapState, mapMutations } from 'vuex'
+import * as R from 'ramda';
+import { mapState, mapMutations, mapGetters } from 'vuex'
 
 import InfoPanel from './InfoPanel.vue';
 
@@ -63,6 +63,7 @@ export default {
     return {
       currentPos: 0,
       value: '',
+      currentSentence: null,
       finalText: '<span class="active">&nbsp;</span>',
       sourceText: mock_data,
       article: '',
@@ -71,16 +72,26 @@ export default {
   },
   watch: {
     value(currentText) {
+      if (currentText.length >= this.currentSentence.length) {
+        this.updateCurrentSentence(this.sentencePos + 1);
+        this.resetTyping();
+      }
       this.updateViewer(currentText);
     }
   },
   computed: {
     ...mapState([
       'fontSize',
+      'sentences',
       'errorCount',
+      'sentencePos',
       'selectedFont',
       'disableTyping',
+      'wordsPerSentence',
       'showCapitalLetters',
+    ]),
+    ...mapGetters([
+      'getSentencesCount',
     ]),
     toogleTypingBtnText(){
       return this.disableTyping
@@ -89,50 +100,53 @@ export default {
     },
   },
   mounted(){
-    this.updateViewer(this.sourceText);
+    this.updateCurrentSentence(0);
+    this.updateViewer(this.currentSentence);
   },
   methods: {
     ...mapMutations([
       'setMenuOpen',
       'setWordsCount',
       'setErrorCount',
+      'setSentencePos',
       'setDisableTyping',
+      'setSentences',
       'increaseErrorCount',
     ]),
-    updateErrorCount(sourceText, currentText, currPosLetter) {
-      if(sourceText[currPosLetter] !== currentText[currPosLetter]) this.increaseErrorCount();
+    updateErrorCount(currentSentence, currentText, currPosLetter) {
+      if(currentSentence[currPosLetter] !== currentText[currPosLetter]) this.increaseErrorCount();
     },
     updateWordsCount(parsedCurrentText, currPosLetter) {
       const count = parsedCurrentText.substr(0, currPosLetter).split('␣').length - 1;
       this.setWordsCount(count);
     },
-    updateViewer(currentText) {
+    updateViewer(text) {
       let analizedText = [];
       let currPosLetter = 0;
-      const parsedCurrentText = currentText.replace(/ /g, '␣');
-      let parsedSourceText = this.sourceText.replace(/ /g, '␣');
-      if(!this.showCapitalLetters) parsedSourceText = parsedSourceText.toLowerCase();
-      for (let i = 0; i < parsedSourceText.length; i++) {
-        const currPosText = parsedCurrentText[i];
-        const currPosSourceText = parsedSourceText[i];
+      const parsedText = text.replace(/ /g, '␣');
+      let parsedCurrentSentence = this.currentSentence.replace(/ /g, '␣');
+      if(!this.showCapitalLetters) parsedCurrentSentence = parsedCurrentSentence.toLowerCase();
+      for (let i = 0; i < parsedCurrentSentence.length; i++) {
+        const currPosText = parsedText[i];
+        const currPosSentenceText = parsedCurrentSentence[i];
         const classes = ['letter'];
-        let finalText = currPosSourceText;
+        let finalText = currPosSentenceText;
 
         if (i === this.value.length) {
           currPosLetter = i - 1;
           classes.push('active')
         }
         if(typeof currPosText !== 'undefined') {
-          const status = currPosText !== currPosSourceText ? 'error' : 'success';
+          const status = currPosText !== currPosSentenceText ? 'error' : 'success';
           finalText = currPosText;
           classes.push(status);
         }
-        if (currPosSourceText === '␣') classes.push('space');
+        if (currPosSentenceText === '␣') classes.push('space');
         const finalLetter = `<span class="${classes.join(' ')}">${finalText}</span>`;
         analizedText.push(finalLetter);
       }
-      this.updateErrorCount(parsedSourceText, parsedCurrentText, currPosLetter);
-      this.updateWordsCount(parsedCurrentText, currPosLetter);
+      this.updateErrorCount(parsedCurrentSentence, parsedText, currPosLetter);
+      this.updateWordsCount(parsedText, currPosLetter);
 
       this.finalText = analizedText.join('');
     },
@@ -144,16 +158,26 @@ export default {
       this.currentPos = 0;
       this.value = '';
       this.setErrorCount(0);
-      this.updateViewer(this.sourceText);
+      this.updateViewer(this.currentSentence);
     },
     preventNotAllowedKeys(e) {
       if(NOT_ALLOWED_KEYS.includes(e.key)) e.preventDefault();
+    },
+    updateCurrentSentence(targetPos) {
+      if (targetPos > this.getSentencesCount) {
+        console.log('DONE');
+      } else {
+        this.setSentencePos(targetPos);
+        this.setSentences(R.splitEvery(this.wordsPerSentence, this.sourceText.split(' ')).map(x => x.join(' ')));
+        this.currentSentence = this.sentences[this.sentencePos];
+      }
     },
     onClickToogleTyping() {
       const { customText, userInput } = this.$refs;
       this.resetTyping();
       this.setDisableTyping(!this.disableTyping);
       this.setMenuOpen(false);
+      this.updateCurrentSentence(0);
 
       if(this.disableTyping) {
         customText.focus();
@@ -161,9 +185,9 @@ export default {
         userInput.removeAttribute('disabled');
         userInput.focus();
         if(this.showCapitalLetters) {
-          this.updateViewer(this.sourceText);
+          this.updateViewer(this.currentSentence);
         } else {
-          this.updateViewer(this.sourceText.toLowerCase());
+          this.updateViewer(this.currentSentence.toLowerCase());
         }
       }
     },

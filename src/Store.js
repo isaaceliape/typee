@@ -5,6 +5,9 @@ const store = {
     showCapitalLetters: true,
     disableTyping: true,
     value: '',
+    sentences: [],
+    sentencePos: 0,
+    wordsPerSentence: 20,
     finalText: '<span class="active">&nbsp;</span>',
     sourceText: '',
     article: '',
@@ -15,15 +18,25 @@ const store = {
       { text: 'Roboto', value: `'Roboto Mono', monospace` },
     ],
     articleTitle: 'Amelia KralesA global phishing',
-    fontSize: 24,
+    fontSize: 30,
+  },
+  getters: {
+    getSentencesCount(state) {
+      return state.sentences.length;
+    },
   },
   mutations: {
     toggleMenuOpen (state) {
       state.menuOpen = !state.menuOpen;
-      console.log('state.menuOpen', state.menuOpen);
     },
     setMenuOpen (state, payload) {
       state.menuOpen = payload;
+    },
+    setSentencePos (state, payload) {
+      state.sentencePos = payload;
+    },
+    setSentences (state, payload) {
+      state.sentences = payload;
     },
     setDisableTyping (state, payload) {
       state.disableTyping = payload;
@@ -47,7 +60,6 @@ const store = {
       state.selectedFont = payload;
     },
     toggleCapitalLetters (state) {
-      console.log('toggleCapitalLetters');
       state.showCapitalLetters = !state.showCapitalLetters;
     },
   },

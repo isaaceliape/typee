@@ -51,6 +51,10 @@
             </select>
           </td>
         </tr>
+        <tr>
+          <td>Words per sentence</td>
+          <td>{{ wordsPerSentence }}</td>
+        </tr>
       </table>
     </div>
   </div>
@@ -83,6 +87,7 @@ export default {
       'fontSize',
       'menuOpen',
       'selectedFont',
+      'wordsPerSentence',
       'disableTyping',
       'showCapitalLetters',
     ]),
@@ -125,14 +130,17 @@ export default {
     border-collapse: separate;
     border: 1px solid black;
     border-radius: 3px;
-    td {
-      border-right: 0;
-      border-top: 0;
-      &:first-child {
-        border-left: 0;
-      }
-    }
     tr {
+      td {
+        border-right: 0;
+        border-top: 0;
+        &:first-child {
+          border-left: 0;
+        }
+        &:last-child {
+          text-align: center;
+        }
+      }
       &:last-child {
         td {
           border-bottom: 0;
