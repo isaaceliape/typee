@@ -110,8 +110,27 @@ export default {
   }
   .Menu {
     position: absolute;
-    left: 0;
-    top: 0;
+    left: 5px;
+    top: 5px;
+  }
+  table {
+    border-collapse: separate;
+    border: 1px solid black;
+    border-radius: 3px;
+    td {
+      border-right: 0;
+      border-top: 0;
+      &:first-child {
+        border-left: 0;
+      }
+    }
+    tr {
+      &:last-child {
+        td {
+          border-bottom: 0;
+        }
+      }
+    }
   }
   .content {
     transition: all 250ms ease;
@@ -126,7 +145,7 @@ export default {
   .fontSizeControlerButtons {
     padding: 4px 8px;
     margin-right: 5px;
-    border-radius: 5px;
+    border-radius: 3px;
     background-color: transparent;
     border: 1px solid;
     vertical-align: middle;

@@ -13,14 +13,23 @@
   .BuggerMenu {
     padding: 5px;
     cursor: pointer;
+    display: inline-block;
+    border-radius: 3px;
+    
     &:hover {
-      opacity: 0.5;
+      background-color: black;
+      .bar {
+        background-color: white;
+      }
     }
     .bar {
       height: 3px;
       width: 30px;
       background-color: gray;
       margin-bottom: 3px;
+      &:last-child {
+        margin-bottom: 0;
+      }
     }
   }
 </style>
