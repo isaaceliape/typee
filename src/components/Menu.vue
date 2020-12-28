@@ -1,5 +1,8 @@
 <template>
-  <div class="Menu">
+  <div
+    class="Menu"
+    :class="{ hide: !disableTyping }"
+  >
     <BurgerMenu @click="onClickBurgerMenu" />
     <div
       class="content"
@@ -112,6 +115,11 @@ export default {
     position: absolute;
     left: 5px;
     top: 5px;
+    transition: left 300ms ease;
+
+    &.hide {
+      left: -50px
+    }
   }
   table {
     border-collapse: separate;
