@@ -52,7 +52,7 @@ import { mapState, mapMutations } from 'vuex'
 
 import InfoPanel from './InfoPanel.vue';
 
-const mock_data = 'Amelia Krales A global phishing campaign has been targeting organizations associated with the distribution of COVID-19 vaccines since September 2020, IBM security researchers say. In a blog post, analysts Claire Zaboeva and Melissa';
+const mock_data = 'The fox jumped over the lazy dog. Pack my box with five dozen liquor jugs. Jived fox nymph grabs quick waltz. Glib jocks quiz nymph to vex dwarf. Sphinx of black quartz, Judge my vow. how vexingly quick daft zebras jump! The five boxing wizards jump quickly. Jackdaws love my big sphinx of quartz.';
 const NOT_ALLOWED_KEYS = ['ArrowLeft','ArrowRight','Tab'];
 
 export default {
@@ -151,6 +151,7 @@ export default {
     },
     onClickToogleTyping() {
       const { customText, userInput } = this.$refs;
+      this.resetTyping();
       this.setDisableTyping(!this.disableTyping);
       this.setMenuOpen(false);
 
@@ -159,7 +160,11 @@ export default {
       } else {
         userInput.removeAttribute('disabled');
         userInput.focus();
-        this.updateViewer(this.sourceText);
+        if(this.showCapitalLetters) {
+          this.updateViewer(this.sourceText);
+        } else {
+          this.updateViewer(this.sourceText.toLowerCase());
+        }
       }
     },
   },
