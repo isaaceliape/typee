@@ -51,8 +51,12 @@ import * as R from 'ramda';
 import { mapState, mapMutations, mapGetters } from 'vuex'
 
 import InfoPanel from './InfoPanel.vue';
+// import pangrams from '../assets/pangrams';
+import mostCommonEnglishWords from '../assets/1000EnglishWords';
 
-const mock_data = 'The fox jumped over the lazy dog. Pack my box with five dozen liquor jugs. Jived fox nymph grabs quick waltz. Glib jocks quiz nymph to vex dwarf. Sphinx of black quartz, Judge my vow. how vexingly quick daft zebras jump! The five boxing wizards jump quickly. Jackdaws love my big sphinx of quartz.';
+console.log('1000EnglishWords', );
+// const mock_data = pangrams.join(' ');
+const mock_data = mostCommonEnglishWords.sort(() => Math.random() - 0.5).join(' ');
 const NOT_ALLOWED_KEYS = ['ArrowLeft','ArrowRight','Tab'];
 
 export default {
