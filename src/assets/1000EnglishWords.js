@@ -999,6 +999,6 @@ const words = [
   "teeth",
   "shell",
   "neck"
-];
+]
 
-export default words;
+export default words

@@ -63,8 +63,8 @@
 <script>
 import { mapState, mapMutations } from 'vuex'
 
-import ToggleButton from './ToggleButton.vue';
-import BurgerMenu from './BurgerMenu.vue';
+import ToggleButton from './ToggleButton.vue'
+import BurgerMenu from './BurgerMenu.vue'
 
 export default {
   components: {
@@ -78,7 +78,7 @@ export default {
   },
   watch: {
     selectedFontValue(value) {
-      this.setSelectedFont(value);
+      this.setSelectedFont(value)
     }
   },
   computed: {
@@ -92,7 +92,7 @@ export default {
       'showCapitalLetters',
     ]),
     menuHiddenClass() {
-      return this.menuOpen ? '' : 'hide';
+      return this.menuOpen ? '' : 'hide'
     },
   },
   methods: {
@@ -105,8 +105,8 @@ export default {
       'toggleCapitalLetters',
     ]),
     onClickBurgerMenu() {
-      this.toggleMenuOpen();
-      if (!this.disableTyping) this.setDisableTyping(true);
+      this.toggleMenuOpen()
+      if (!this.disableTyping) this.setDisableTyping(true)
     }
   }
 }

@@ -8,9 +8,9 @@
 <script>
 import { mapState, mapMutations } from 'vuex'
 
-import Menu from './components/Menu.vue';
-import helpers from './helpers.js';
-import TextRenderer from './components/TextRenderer';
+import Menu from './components/Menu.vue'
+import helpers from './helpers.js'
+import TextRenderer from './components/TextRenderer'
 
 export default {
   name: 'App',
@@ -25,8 +25,8 @@ export default {
     ])
   },
   mounted() {
-    if(!this.selectedFont) this.setSelectedFont(this.fonts[1]);
-    helpers.updateSelectedFont(this.selectedFont);
+    if(!this.selectedFont) this.setSelectedFont(this.fonts[1])
+    helpers.updateSelectedFont(this.selectedFont)
   },
   methods: {
     ...mapMutations([
@@ -35,7 +35,7 @@ export default {
   },
   watch: {
     selectedFont(value) {
-      helpers.updateSelectedFont(value);
+      helpers.updateSelectedFont(value)
     },
   },
   head: {

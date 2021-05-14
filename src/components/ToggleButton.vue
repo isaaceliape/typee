@@ -18,7 +18,7 @@ export default {
   },
   computed: {
     activeClass() {
-      return this.active ? 'active' : '';
+      return this.active ? 'active' : ''
     },
   },
 }
