@@ -46,7 +46,7 @@
                 :value="value"
                 :selected="value === selectedFont ? 'selected' : false"
               >
-                {{text}}
+                {{ text }}
               </option>
             </select>
           </td>
@@ -76,11 +76,6 @@ export default {
       selectedFontValue: `'Ubuntu Mono', monospace`,
     };
   },
-  watch: {
-    selectedFontValue(value) {
-      this.setSelectedFont(value)
-    }
-  },
   computed: {
     ...mapState([
       'fonts',
@@ -94,6 +89,11 @@ export default {
     menuHiddenClass() {
       return this.menuOpen ? '' : 'hide'
     },
+  },
+  watch: {
+    selectedFontValue(value) {
+      this.setSelectedFont(value)
+    }
   },
   methods: {
     ...mapMutations([

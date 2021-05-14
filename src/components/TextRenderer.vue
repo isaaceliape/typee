@@ -1,3 +1,4 @@
+/* eslint-disable vue/no-v-html */
 <template>
   <div class="TextRenderer">
     <InfoPanel />
@@ -14,12 +15,12 @@
     >
       <input
         ref="userInput"
+        v-model="value"
         class="userInput"
         disabled="disabled"
         autofocus
-        v-model="value"
         @keydown="onKeydownUserInput"
-      />
+      >
       <div
         ref="viewer"
         class="viewer"
@@ -70,15 +71,6 @@ export default {
       articleTitle: '',
     }
   },
-  watch: {
-    value(currentText) {
-      if (currentText.length >= this.currentSentence.length) {
-        this.updateCurrentSentence(this.sentencePos + 1)
-        this.resetTyping()
-      }
-      this.updateViewer(currentText)
-    }
-  },
   computed: {
     ...mapState([
       'fontSize',
@@ -97,6 +89,15 @@ export default {
       const action = this.disableTyping ? 'start' : 'stop'
       return `Click here to ${action} typing`
     },
+  },
+  watch: {
+    value(currentText) {
+      if (currentText.length >= this.currentSentence.length) {
+        this.updateCurrentSentence(this.sentencePos + 1)
+        this.resetTyping()
+      }
+      this.updateViewer(currentText)
+    }
   },
   mounted(){
     this.updateCurrentSentence(0)

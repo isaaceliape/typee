@@ -1,14 +1,11 @@
 import 'es6-promise/auto'
 import { createApp } from 'vue';
-import { createStore } from 'vuex'
 import VueHead from 'vue-head'
-// import createPersistedState from "vuex-persistedstate";
 import App from './App.vue'
-import store from './Store.js'
+import AppStore from './store/AppStore.js'
 
-const appAstore = new createStore(store);
 const app = createApp(App)
-
-app.use(appAstore)
+window.store = AppStore
+app.use(AppStore)
 app.use(VueHead)
 app.mount('#app')

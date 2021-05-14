@@ -4,7 +4,7 @@
     :class="activeClass"
     @click="$emit('on-click-toggle-button')"
   >
-    <div class="knob"/>
+    <div class="knob" />
   </div>
 </template>
 
