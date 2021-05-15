@@ -1,7 +1,7 @@
 <template>
   <div
     class="BuggerMenu"
-    v-on="$listeners"
+    v-on="$attrs"
   >
     <div class="bar" />
     <div class="bar" />

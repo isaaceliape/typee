@@ -46,7 +46,7 @@
                 :value="value"
                 :selected="value === selectedFont ? 'selected' : false"
               >
-                {{text}}
+                {{ text }}
               </option>
             </select>
           </td>
@@ -63,8 +63,8 @@
 <script>
 import { mapState, mapMutations } from 'vuex'
 
-import ToggleButton from './ToggleButton.vue';
-import BurgerMenu from './BurgerMenu.vue';
+import ToggleButton from './ToggleButton.vue'
+import BurgerMenu from './BurgerMenu.vue'
 
 export default {
   components: {
@@ -75,11 +75,6 @@ export default {
     return {
       selectedFontValue: `'Ubuntu Mono', monospace`,
     };
-  },
-  watch: {
-    selectedFontValue(value) {
-      this.setSelectedFont(value);
-    }
   },
   computed: {
     ...mapState([
@@ -92,8 +87,13 @@ export default {
       'showCapitalLetters',
     ]),
     menuHiddenClass() {
-      return this.menuOpen ? '' : 'hide';
+      return this.menuOpen ? '' : 'hide'
     },
+  },
+  watch: {
+    selectedFontValue(value) {
+      this.setSelectedFont(value)
+    }
   },
   methods: {
     ...mapMutations([
@@ -105,8 +105,8 @@ export default {
       'toggleCapitalLetters',
     ]),
     onClickBurgerMenu() {
-      this.toggleMenuOpen();
-      if (!this.disableTyping) this.setDisableTyping(true);
+      this.toggleMenuOpen()
+      if (!this.disableTyping) this.setDisableTyping(true)
     }
   }
 }
