@@ -9,6 +9,8 @@
 </template>
 
 <script>
+import { computed } from 'vue'
+
 export default {
   props: {
     active: {
@@ -16,14 +18,10 @@ export default {
       default: false,
     },
   },
-  emits: [
-    'on-click-toggle-button',
-  ],
-  computed: {
-    activeClass() {
-      return this.active ? 'active' : ''
-    },
-  },
+  emits: ['on-click-toggle-button'],
+  setup(props) {
+    return { activeClass: computed(() => props.active ? 'active' : '') }
+  }
 }
 </script>
 
