@@ -61,7 +61,9 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from 'vuex'
+import { useStore } from 'vuex'
+import { mapAppState, mapAppMutations } from '../helpers'
+import { computed } from 'vue'
 
 import ToggleButton from './ToggleButton.vue'
 import BurgerMenu from './BurgerMenu.vue'
@@ -71,44 +73,49 @@ export default {
     BurgerMenu,
     ToggleButton,
   },
-  data() {
-    return {
-      selectedFontValue: `'Ubuntu Mono', monospace`,
-    };
-  },
-  computed: {
-    ...mapState([
-      'fonts',
-      'fontSize',
-      'menuOpen',
-      'selectedFont',
-      'wordsPerSentence',
-      'disableTyping',
-      'showCapitalLetters',
-    ]),
-    menuHiddenClass() {
-      return this.menuOpen ? '' : 'hide'
-    },
-  },
-  watch: {
-    selectedFontValue(value) {
-      this.setSelectedFont(value)
-    }
-  },
-  methods: {
-    ...mapMutations([
-      'toggleMenuOpen',
-      'setSelectedFont',
-      'increaseFontSize',
-      'decreaseFontSize',
-      'setDisableTyping',
-      'toggleCapitalLetters',
-    ]),
-    onClickBurgerMenu() {
+  setup() {
+    const store = useStore()
+
+    const appState = mapAppState([
+        'fonts',
+        'fontSize',
+        'menuOpen',
+        'selectedFont',
+        'wordsPerSentence',
+        'disableTyping',
+        'showCapitalLetters',
+      ], store)
+    const appMutations = mapAppMutations([
+        'toggleMenuOpen',
+        'setSelectedFont',
+        'increaseFontSize',
+        'decreaseFontSize',
+        'setDisableTyping',
+        'toggleCapitalLetters',
+      ], store)
+      
+    const menuHiddenClass = computed(() => appState.menuOpen ? '' : 'hide')
+
+    const selectedFontValue = computed({
+      get: () => appState.selectedFont,
+      set: (value) => {
+        appMutations.setSelectedFont(value)
+      }
+    })
+
+    function onClickBurgerMenu() {
       this.toggleMenuOpen()
-      if (!this.disableTyping) this.setDisableTyping(true)
+      if (!appState.disableTyping) appMutations.setDisableTyping(true)
     }
-  }
+
+    return {
+      ...appState,
+      ...appMutations,
+      menuHiddenClass,
+      onClickBurgerMenu,
+      selectedFontValue,
+    }
+  },
 }
 </script>
 

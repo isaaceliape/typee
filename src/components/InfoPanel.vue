@@ -16,23 +16,26 @@
 </template>
 
 <script>
-import { mapState, mapMutations, mapGetters } from 'vuex'
+import { useStore } from 'vuex'
+import { mapAppState, mapAppGetters, mapAppMutations } from '../helpers'
 
 export default {
-  computed:{
-    ...mapState([
-      'errorCount',
-      'fontSize',
-      'sentences',
-      'wordsCount',
-      'sentencePos',
-      'showCapitalLetters',
-    ]),
-    ...mapGetters([
-      'getSentencesCount',
-    ]),
-  },
-  methods: mapMutations(['toggleCapitalLetters'])
+  setup() {
+    const store = useStore()
+    
+    return {
+      ...mapAppState([
+        'errorCount',
+        'fontSize',
+        'sentences',
+        'wordsCount',
+        'sentencePos',
+        'showCapitalLetters',
+      ], store),
+      ...mapAppGetters(['getSentencesCount'], store),
+      ...mapAppMutations(['toggleCapitalLetters'], store)
+    }
+  }
 }
 </script>
 

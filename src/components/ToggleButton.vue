@@ -16,6 +16,9 @@ export default {
       default: false,
     },
   },
+  emits: [
+    'on-click-toggle-button',
+  ],
   computed: {
     activeClass() {
       return this.active ? 'active' : ''
