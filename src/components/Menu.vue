@@ -135,7 +135,7 @@ export default {
   }
   table {
     border-collapse: separate;
-    border: 1px solid black;
+    border: 1px solid var(--line-default);
     border-radius: 3px;
     tr {
       td {
@@ -170,11 +170,12 @@ export default {
     margin-right: 5px;
     border-radius: 3px;
     background-color: transparent;
-    border: 1px solid;
+    border: 1px solid var(--line-default);;
     vertical-align: middle;
     cursor: pointer;
+    color: var(--text-default);
     &:hover {
-      background-color: black;
+      background-color: var(--line-default);
       color: white;
       border-color: transparent;
     }

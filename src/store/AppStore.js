@@ -6,6 +6,7 @@ export default createStore({
     errorCount: 0,
     wordsCount: 0,
     showCapitalLetters: true,
+    showDarkMode: false,
     disableTyping: true,
     value: '',
     sentences: [],
@@ -52,6 +53,9 @@ export default createStore({
     },
     toggleCapitalLetters(state) {
       state.showCapitalLetters = !state.showCapitalLetters;
+    },
+    toggleDarkMode(state) {
+      state.showDarkMode = !state.showDarkMode;
     },
   },
 })

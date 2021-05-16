@@ -44,7 +44,8 @@ table {
   margin: 0 auto;
   text-align: center;
   border-collapse: separate;
-  border: 1px solid black;
+  border: 1px solid var(--line-default);
+  color: var(--text-default);
   border-radius: 3px;
   th,
   td {

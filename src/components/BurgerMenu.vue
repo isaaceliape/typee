@@ -25,7 +25,7 @@
     .bar {
       height: 3px;
       width: 30px;
-      background-color: black;
+      background-color: var(--line-default);
       margin-bottom: 3px;
       &:last-child {
         margin-bottom: 0;

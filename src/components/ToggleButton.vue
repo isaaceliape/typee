@@ -27,7 +27,7 @@ export default {
 
 <style lang="scss" scoped>
   .ToggleButton {
-    border: 1px solid;
+    border: 1px solid var(--line-default);
     border-radius: 5px;
   }
   .ToggleButton {

@@ -205,9 +205,10 @@ export default {
   }
 
   table, th, td {
-    border: 1px solid black;
+    border: 1px solid var(--line-default);
     border-collapse: collapse;
     font-size: 16px;
+    color: var(--text-default);
   }
 
   th, td {
@@ -249,6 +250,8 @@ export default {
   }
 
   .customText {
+    background-color: var(--bg-default);
+    color: var(--text-default);
     padding: 10px 15px;
     margin: 50px auto 15px auto;
     display: block;
@@ -261,6 +264,7 @@ export default {
     height: 20vh;
     opacity: 1;
     outline: none;
+    border-color: var(--line-default);
 
     &.disabled {
       height: 0;
@@ -270,7 +274,7 @@ export default {
   }
   .viewer {
     pointer-events: none;
-    color: black;
+    color: var(--text-default);
     position: relative;
     z-index: 1;
     padding: 10px;
@@ -321,8 +325,9 @@ export default {
   }
 
   .toogleTyping {
-    border: 1px solid black;
-    background: #fff;
+    border: 1px solid var(--text-default);
+    background: var(--bg-default);
+    color: var(--text-default);
     border-radius: 3px;
     padding: 5px 10px;
     margin: 0 auto;
@@ -333,7 +338,7 @@ export default {
     &:hover {
       background-color: black;
       color: white;
-      border-color: transparent;
+      border-color: white ;
     }
   }
   @keyframes blink {
