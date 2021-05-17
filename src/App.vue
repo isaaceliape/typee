@@ -1,7 +1,8 @@
 <template>
-  <div id="app" >
+  <div id="app">
     <ToggleButton
       :active="showDarkMode"
+      :bg="true"
       @on-click-toggle-button="setToggleDarkMode"
     />
     <Menu />

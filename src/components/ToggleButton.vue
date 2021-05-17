@@ -1,7 +1,7 @@
 <template>
   <div
     class="ToggleButton"
-    :class="activeClass"
+    :class="[{bg: bg}, activeClass]"
     @click="$emit('on-click-toggle-button')"
   >
     <div class="knob" />
@@ -17,6 +17,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    bg:{
+      type: Boolean,
+      default: false
+    }
   },
   emits: ['on-click-toggle-button'],
   setup(props) {
@@ -41,6 +45,17 @@ export default {
         border-right: 1px solid;
         border-left: 0;
         opacity: 1;
+      }
+    }
+    &.bg{
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: url('../assets/moon-black.svg') 6px center/14px no-repeat;
+      &.active{
+        .knob{
+          background: url('../assets/moon.svg') 6px center/14px no-repeat #c3c3c3;
+        }
       }
     }
   }
