@@ -77,24 +77,24 @@ export default {
     const store = useStore()
 
     const appState = mapAppState([
-        'fonts',
-        'fontSize',
-        'menuOpen',
-        'selectedFont',
-        'wordsPerSentence',
-        'disableTyping',
-        'showCapitalLetters',
-      ], store)
+      'fonts',
+      'fontSize',
+      'menuOpen',
+      'selectedFont',
+      'wordsPerSentence',
+      'disableTyping',
+      'showCapitalLetters',
+    ], store)
     const appMutations = mapAppMutations([
-        'toggleMenuOpen',
-        'setSelectedFont',
-        'increaseFontSize',
-        'decreaseFontSize',
-        'setDisableTyping',
-        'toggleCapitalLetters',
-      ], store)
+      'toggleMenuOpen',
+      'setSelectedFont',
+      'increaseFontSize',
+      'decreaseFontSize',
+      'setDisableTyping',
+      'toggleCapitalLetters',
+    ], store)
       
-    const menuHiddenClass = computed(() => appState.menuOpen ? '' : 'hide')
+    const menuHiddenClass = computed(() => appState.menuOpen.value ? '' : 'hide')
 
     const selectedFontValue = computed({
       get: () => appState.selectedFont,
@@ -104,8 +104,8 @@ export default {
     })
 
     function onClickBurgerMenu() {
-      this.toggleMenuOpen()
-      if (!appState.disableTyping) appMutations.setDisableTyping(true)
+      appMutations.toggleMenuOpen()
+      if (!appState.disableTyping.value) appMutations.setDisableTyping(true)
     }
 
     return {
@@ -127,10 +127,12 @@ export default {
     position: absolute;
     left: 5px;
     top: 5px;
-    transition: left 300ms ease;
+    transform: translateX(0);
+    transition: all 300ms ease;
 
     &.hide {
-      left: -50px
+      transform: translateX(-100%);
+      left: 0;
     }
   }
   table {

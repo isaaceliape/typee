@@ -23,7 +23,7 @@ export const mapAppGetters = (items, store) => {
 
 export const mapAppMutations = (items, store) => {
   return items.reduce((accumulator, currentValue) => ({ ...accumulator, ...{
-    [currentValue]: () => store.commit(currentValue)
+    [currentValue]: (payload) => store.commit(currentValue, payload)
   }}), {})
 }
 

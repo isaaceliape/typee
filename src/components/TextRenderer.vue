@@ -1,4 +1,3 @@
-/* eslint-disable vue/no-v-html */
 <template>
   <div class="TextRenderer">
     <InfoPanel />
@@ -22,6 +21,7 @@
         @keydown="onKeydownUserInput"
         @blur="onClickToogleTyping"
       >
+      <!-- eslint-disable vue/no-v-html -->
       <div
         ref="viewer"
         class="viewer"
@@ -88,7 +88,7 @@ export default {
     ]),
     toogleTypingBtnText(){
       const action = this.disableTyping ? 'start' : 'stop'
-      return `Click here to ${action} typing`
+      return `${action} typing`
     },
   },
   watch: {
@@ -177,6 +177,7 @@ export default {
     },
     onClickToogleTyping() {
       const { customText, userInput } = this.$refs
+      let sentence = this.currentSentence;
       this.resetTyping()
       this.setDisableTyping(!this.disableTyping)
       this.setMenuOpen(false)
@@ -189,11 +190,8 @@ export default {
 
       userInput.removeAttribute('disabled')
       userInput.focus()
-      if(this.showCapitalLetters) {
-        this.updateViewer(this.currentSentence)
-      } else {
-        this.updateViewer(this.currentSentence.toLowerCase())
-      }
+      sentence = this.showCapitalLetters ? sentence : sentence.toLowerCase();
+      this.updateViewer(sentence);
     },
   },
 }
