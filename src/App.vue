@@ -39,6 +39,9 @@ export default {
   mounted() {
     if(!this.selectedFont) this.setSelectedFont(this.fonts[1])
     updateSelectedFont(this.selectedFont)
+    if('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js')
+    }
   },
   methods: {
     ...mapMutations([
