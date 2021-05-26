@@ -46,7 +46,7 @@
                 :value="value"
                 :selected="value === selectedFont ? 'selected' : false"
               >
-                {{text}}
+                {{ text }}
               </option>
             </select>
           </td>
@@ -61,28 +61,22 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from 'vuex'
+import { useStore } from 'vuex'
+import { mapAppState, mapAppMutations } from '../helpers'
+import { computed } from 'vue'
 
-import ToggleButton from './ToggleButton.vue';
-import BurgerMenu from './BurgerMenu.vue';
+import ToggleButton from './ToggleButton.vue'
+import BurgerMenu from './BurgerMenu.vue'
 
 export default {
   components: {
     BurgerMenu,
     ToggleButton,
   },
-  data() {
-    return {
-      selectedFontValue: `'Ubuntu Mono', monospace`,
-    };
-  },
-  watch: {
-    selectedFontValue(value) {
-      this.setSelectedFont(value);
-    }
-  },
-  computed: {
-    ...mapState([
+  setup() {
+    const store = useStore()
+
+    const appState = mapAppState([
       'fonts',
       'fontSize',
       'menuOpen',
@@ -90,25 +84,38 @@ export default {
       'wordsPerSentence',
       'disableTyping',
       'showCapitalLetters',
-    ]),
-    menuHiddenClass() {
-      return this.menuOpen ? '' : 'hide';
-    },
-  },
-  methods: {
-    ...mapMutations([
+    ], store)
+    const appMutations = mapAppMutations([
       'toggleMenuOpen',
       'setSelectedFont',
       'increaseFontSize',
       'decreaseFontSize',
       'setDisableTyping',
       'toggleCapitalLetters',
-    ]),
-    onClickBurgerMenu() {
-      this.toggleMenuOpen();
-      if (!this.disableTyping) this.setDisableTyping(true);
+    ], store)
+      
+    const menuHiddenClass = computed(() => appState.menuOpen.value ? '' : 'hide')
+
+    const selectedFontValue = computed({
+      get: () => appState.selectedFont,
+      set: (value) => {
+        appMutations.setSelectedFont(value)
+      }
+    })
+
+    function onClickBurgerMenu() {
+      appMutations.toggleMenuOpen()
+      if (!appState.disableTyping.value) appMutations.setDisableTyping(true)
     }
-  }
+
+    return {
+      ...appState,
+      ...appMutations,
+      menuHiddenClass,
+      onClickBurgerMenu,
+      selectedFontValue,
+    }
+  },
 }
 </script>
 
@@ -120,10 +127,12 @@ export default {
     position: absolute;
     left: 5px;
     top: 5px;
-    transition: left 300ms ease;
+    transform: translateX(0);
+    transition: all 300ms ease;
 
     &.hide {
-      left: -50px
+      transform: translateX(-100%);
+      left: 0;
     }
   }
   table {

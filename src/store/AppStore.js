@@ -1,4 +1,7 @@
-const store = {
+import { createStore } from 'vuex'
+import mutationFactory from '../helpers.js'
+
+export default createStore({
   state: {
     errorCount: 0,
     wordsCount: 0,
@@ -26,43 +29,29 @@ const store = {
     },
   },
   mutations: {
-    toggleMenuOpen (state) {
+    ...mutationFactory([
+      'menuOpen',
+      'sentences',
+      'errorCount',
+      'wordsCount',
+      'sentencePos',
+      'selectedFont',
+      'disableTyping',
+    ]),
+    toggleMenuOpen(state) {
       state.menuOpen = !state.menuOpen;
     },
-    setMenuOpen (state, payload) {
-      state.menuOpen = payload;
-    },
-    setSentencePos (state, payload) {
-      state.sentencePos = payload;
-    },
-    setSentences (state, payload) {
-      state.sentences = payload;
-    },
-    setDisableTyping (state, payload) {
-      state.disableTyping = payload;
-    },
-    increaseErrorCount (state) {
+    increaseErrorCount(state) {
       state.errorCount += 1;
     },
-    setErrorCount (state, payload) {
-      state.errorCount = payload;
-    },
-    increaseFontSize (state) {
+    increaseFontSize(state) {
       state.fontSize += 1;
     },
-    decreaseFontSize (state) {
+    decreaseFontSize(state) {
       state.fontSize -= 1;
     },
-    setWordsCount (state, payload) {
-      state.wordsCount = payload;
-    },
-    setSelectedFont (state, payload) {
-      state.selectedFont = payload;
-    },
-    toggleCapitalLetters (state) {
+    toggleCapitalLetters(state) {
       state.showCapitalLetters = !state.showCapitalLetters;
     },
   },
-};
-
-export default store;
+})

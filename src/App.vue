@@ -7,10 +7,10 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex'
+import { updateSelectedFont } from './helpers.js'
 
-import Menu from './components/Menu.vue';
-import helpers from './helpers.js';
-import TextRenderer from './components/TextRenderer';
+import Menu from './components/Menu.vue'
+import TextRenderer from './components/TextRenderer'
 
 export default {
   name: 'App',
@@ -18,32 +18,35 @@ export default {
     Menu,
     TextRenderer,
   },
-  computed: {
-    ...mapState([
-      'selectedFont',
-      'fonts',
-    ])
-  },
-  mounted() {
-    if(!this.selectedFont) this.setSelectedFont(this.fonts[1]);
-    helpers.updateSelectedFont(this.selectedFont);
-  },
-  methods: {
-    ...mapMutations([
-      'setSelectedFont',
-    ]),
-  },
-  watch: {
-    selectedFont(value) {
-      helpers.updateSelectedFont(value);
-    },
-  },
   head: {
     link: [
       { rel: 'preconnect', href: 'https://fonts.gstatic.com'},
       { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap'},
       { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Ubuntu+Mono:wght@400;700&display=swap'},
     ],
+  },
+  computed: {
+    ...mapState([
+      'selectedFont',
+      'fonts',
+    ])
+  },
+  watch: {
+    selectedFont(value) {
+      updateSelectedFont(value)
+    },
+  },
+  mounted() {
+    if(!this.selectedFont) this.setSelectedFont(this.fonts[1])
+    updateSelectedFont(this.selectedFont)
+    if('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js')
+    }
+  },
+  methods: {
+    ...mapMutations([
+      'setSelectedFont',
+    ]),
   },
 }
 </script>
@@ -70,5 +73,4 @@ export default {
     outline: 0;
     cursor: pointer;
   }
-
 </style>

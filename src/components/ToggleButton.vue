@@ -4,11 +4,13 @@
     :class="activeClass"
     @click="$emit('on-click-toggle-button')"
   >
-    <div class="knob"/>
+    <div class="knob" />
   </div>
 </template>
 
 <script>
+import { computed } from 'vue'
+
 export default {
   props: {
     active: {
@@ -16,11 +18,10 @@ export default {
       default: false,
     },
   },
-  computed: {
-    activeClass() {
-      return this.active ? 'active' : '';
-    },
-  },
+  emits: ['on-click-toggle-button'],
+  setup(props) {
+    return { activeClass: computed(() => props.active ? 'active' : '') }
+  }
 }
 </script>
 
