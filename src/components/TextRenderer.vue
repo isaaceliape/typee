@@ -20,6 +20,7 @@
         disabled="disabled"
         autofocus
         @keydown="onKeydownUserInput"
+        @blur="onClickToogleTyping"
       >
       <div
         ref="viewer"
