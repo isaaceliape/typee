@@ -9,6 +9,7 @@
     </h1>
     <div
       ref="wrapViewer"
+      :style="{fontSize: `${fontSize}px`, fontFamily: `${selectedFont}`}"
       class="wrapViewer"
       :class="{ disabled: disableTyping }"
     >
@@ -19,14 +20,19 @@
         disabled="disabled"
         autofocus
         @keydown="onKeydownUserInput"
-        @blur="onClickToogleTyping"
       >
+      <!-- @blur="onClickToogleTyping" -->
       <!-- eslint-disable vue/no-v-html -->
-      <div
+      <!-- <div
         ref="viewer"
         class="viewer"
         :style="{fontSize: `${fontSize}px`, fontFamily: `${selectedFont}`}"
         v-html="finalText"
+      /> -->
+      <Word
+        v-for="word in words"
+        :key="word.id"
+        :letters="word.letters"
       />
     </div>
     <button
@@ -35,15 +41,6 @@
     >
       {{ toogleTypingBtnText }}
     </button>
-    <textarea
-      ref="customText"
-      v-model="sourceText"
-      class="customText"
-      :class="{disabled: !disableTyping}"
-      :style="{fontSize: `${fontSize}px`, fontFamily: `${selectedFont}`}"
-      rows="4"
-      cols="50"
-    />
   </div>
 </template>
 
@@ -52,6 +49,7 @@ import * as R from 'ramda'
 import { mapState, mapMutations, mapGetters } from 'vuex'
 
 import InfoPanel from './InfoPanel.vue'
+import Word from './Word.vue'
 import mostCommonEnglishWords from '../assets/1000EnglishWords'
 
 const mock_data = mostCommonEnglishWords.sort(() => Math.random() - 0.5).join(' ')
@@ -60,16 +58,22 @@ const NOT_ALLOWED_KEYS = ['ArrowLeft','ArrowRight','Tab']
 export default {
   components: {
     InfoPanel,
+    Word,
   },
   data() {
     return {
-      currentPos: 0,
+      currentPos: {
+        word: 0,
+        letter: 0,
+      },
       value: '',
       currentSentence: null,
-      finalText: '<span class="active">&nbsp;</span>',
+      finalText: '',
       sourceText: mock_data,
       article: '',
       articleTitle: '',
+      words: [],
+      typedText: [],
     }
   },
   computed: {
@@ -102,7 +106,11 @@ export default {
   },
   mounted(){
     this.updateCurrentSentence(0)
-    this.updateViewer(this.currentSentence)
+    // this.updateViewer(this.currentSentence)
+    this.words = this.parceSentence(this.currentSentence)
+    this.typedText = this.parceSentence(this.value)
+    console.log('this.typedText', this.typedText)
+    // this.onClickToogleTyping()
   },
   methods: {
     ...mapMutations([
@@ -123,45 +131,109 @@ export default {
         .split('␣').length - 1
       this.setWordsCount(count)
     },
-    updateViewer(text) {
-      let analizedText = []
-      let currPosLetter = 0
-      const parsedText = text.replace(/ /g, '␣')
-      let parsedCurrentSentence = this.currentSentence.replace(/ /g, '␣')
-      if(!this.showCapitalLetters) parsedCurrentSentence = parsedCurrentSentence.toLowerCase()
-      for (let i = 0; i < parsedCurrentSentence.length; i++) {
-        const currPosText = parsedText[i]
-        const currPosSentenceText = parsedCurrentSentence[i]
-        const classes = ['letter']
-        let finalText = currPosSentenceText
+    addSpaces(_words) {
+      const words = []
+      _words.forEach((word, i) => {
+        words.push(word)
+        words.push({
+          id: i,
+          letters: [{
+            id: 0,
+            text: '␣',
+            statuses: [],
+          }],
+        })
+      });
+      return words
+    },
+    parceSentence(_text) {
+      let text = _text
+      if (!this.showCapitalLetters) text = text.toLowerCase()
+      let words = text
+        .split(' ')
+        .map((word, i) => ({
+          id: i,
+          text: word,
+          letters: [...word].map((letter, j) => ({
+            id: j,
+            text: letter,
+            statuses: [],
+          })),
+        }))
+      words = this.addSpaces(words)
+      // words[this.currentPos.word].letters[this.currentPos.letter].statuses = ['active']
+      return words
+    },
+    updateViewer() {
+      // const isNotFirstWord = this.value.includes(' ')
+      // let typedWords = this.value.split(' ')
+      // const currentWordPos = isNotFirstWord ? typedWords.length : 0
+      // const currentLetterPos = isNotFirstWord ? typedWords[currentWordPos].length : this.value.length
+      // console.log('typedWords', typedWords);
+      this.typedText.forEach((typedWord) => {
+        typedWord.letters.forEach((typedLetter, j) => {
+          console.log(typedLetter, j);
+      //     const word = this.words[i];
+      //     const letter = word.letters[j];
+      //     this.removeStatus(letter, ['active', 'error', 'success'])
+      //     if (letter.text !== typedLetter) {
+      //       this.addStatus(letter, 'error')
+      //       // console.log('error letter', letter);
+      //     }
+      //     if (letter.text === typedLetter) {
+      //       this.addStatus(letter, 'success')
+      //       // console.log('success letter', letter);
+      //     }
+        })
+      })
+      // const currentLetter = this.words[currentWordPos].letters[currentLetterPos]
+      // console.log('currentLetter', currentLetter);
+      // this.addStatus(currentLetter, 'active')
+      // console.log('currentLetter', currentLetter)
+    },
+    gotoNextPos(_words) {
+      let words = _words
+      const targetLetterPos = this.currentPos.letter + 1
+      const targetWord = this.currentPos.word + 1
 
-        if (i === this.value.length) {
-          currPosLetter = i - 1
-          classes.push('active')
-        }
-        if(typeof currPosText !== 'undefined') {
-          const status = currPosText !== currPosSentenceText ? 'error' : 'success'
-          finalText = currPosText
-          classes.push(status)
-        }
-        if (currPosSentenceText === '␣') classes.push('space')
-        const finalLetter = `<span class="${classes.join(' ')}">${finalText}</span>`
-        analizedText.push(finalLetter)
+      const currentWord = words[this.currentPos.word].text
+      const currentWordLength = currentWord.length
+      const wordsLength = words.length
+
+      console.log({
+        currentWord,
+        targetLetterPos,
+        currentWordLength,
+        targetWord,
+        wordsLength,
+      })
+      if (targetLetterPos <= currentWordLength) {
+        this.currentPos.letter = targetLetterPos;
+        this.addStatus(words[targetWord].letters[targetLetterPos], 'active')
+        return
       }
-      this.updateErrorCount(parsedCurrentSentence, parsedText, currPosLetter)
-      this.updateWordsCount(parsedText, currPosLetter)
-
-      this.finalText = analizedText.join('')
+      if (targetWord <= wordsLength) {
+        this.currentPos.letter = 0;
+        this.currentPos.word = targetWord;
+        this.addStatus(words[targetWord].letters[targetLetterPos], 'active')
+        return
+      }
+      if (targetWord > wordsLength) {
+        this.currentPos.letter = currentWordLength;
+        this.currentPos.word = wordsLength;
+        this.addStatus(words[targetWord].letters[targetLetterPos], 'active')
+        return
+      }
     },
     onKeydownUserInput(e) {
       this.preventNotAllowedKeys(e);
       if (e.key === 'Escape') this.resetTyping()
     },
     resetTyping() {
-      this.currentPos = 0
+      // this.currentPos = 0
       this.value = ''
       this.setErrorCount(0)
-      this.updateViewer(this.currentSentence)
+      // this.updateViewer(this.currentSentence)
     },
     preventNotAllowedKeys(e) {
       if(NOT_ALLOWED_KEYS.includes(e.key)) e.preventDefault()
@@ -175,9 +247,18 @@ export default {
         this.currentSentence = this.sentences[this.sentencePos]
       }
     },
+    removeStatus(letter, status){
+      const listMethod =  item => !status.includes(item)
+      const stringMethod =  item => item !== status
+      const targetMethod = Array.isArray(status) ? listMethod : stringMethod
+      letter.statuses = letter.statuses.filter(targetMethod);
+    },
+    addStatus(letter, status){
+      this.removeStatus(letter, status);
+      letter.statuses.push(status)
+    },
     onClickToogleTyping() {
       const { customText, userInput } = this.$refs
-      let sentence = this.currentSentence;
       this.resetTyping()
       this.setDisableTyping(!this.disableTyping)
       this.setMenuOpen(false)
@@ -190,8 +271,6 @@ export default {
 
       userInput.removeAttribute('disabled')
       userInput.focus()
-      sentence = this.showCapitalLetters ? sentence : sentence.toLowerCase();
-      this.updateViewer(sentence);
     },
   },
 }
@@ -273,44 +352,6 @@ export default {
     position: relative;
     z-index: 1;
     padding: 10px;
-  }
-
-  .letter {
-    position: relative;
-    display: inline-block;
-
-    &.success {
-      color: #80808063;
-
-      &.space:before {
-        color: black;
-      }
-    }
-    &.error {
-      color: white;
-      background-color: red;
-
-      &.space {
-        opacity: 1;
-        color: white;
-      }
-    }
-    &.active {
-      &.space {
-        animation: blink 600ms steps(1, start) infinite;
-        &.error:before {
-          color: red;
-          opacity: 1;
-        }
-      }
-    }
-    &.active {
-      animation: blink 600ms steps(1, start) infinite;
-    }
-    &.space {
-      color: gray;
-      opacity: 0.3;
-    }
   }
 
   .articleTitle {
