@@ -19,14 +19,18 @@
         disabled="disabled"
         autofocus
         @keydown="onKeydownUserInput"
-        @blur="onClickToogleTyping"
       >
+      <!-- @blur="onClickToogleTyping" -->
       <!-- eslint-disable vue/no-v-html -->
       <div
         ref="viewer"
         class="viewer"
         :style="{fontSize: `${fontSize}px`, fontFamily: `${selectedFont}`}"
         v-html="finalText"
+      />
+      <div
+        ref="caret"
+        class="caret animate"
       />
     </div>
     <button
@@ -56,6 +60,7 @@ import mostCommonEnglishWords from '../assets/1000EnglishWords'
 
 const mock_data = mostCommonEnglishWords.sort(() => Math.random() - 0.5).join(' ')
 const NOT_ALLOWED_KEYS = ['ArrowLeft','ArrowRight','Tab']
+let debounceTimer = null;
 
 export default {
   components: {
@@ -150,12 +155,29 @@ export default {
       }
       this.updateErrorCount(parsedCurrentSentence, parsedText, currPosLetter)
       this.updateWordsCount(parsedText, currPosLetter)
-
       this.finalText = analizedText.join('')
+      this.updateCaretPos();
+    },
+    updateCaretPos() {
+      this.$nextTick(() => {
+        const activeLetterEl = document.querySelector('.viewer .active');
+        const caret = document.querySelector('.caret');
+        caret.classList.remove('animate');
+        if (!activeLetterEl) return; 
+        const { y, x } = activeLetterEl.getBoundingClientRect();
+        const topExtaPixels = (y / 100) * 2
+        caret.style.left = `${x - 1}px`;
+        caret.style.top = `${y + topExtaPixels}px`;
+        this.debounce(() => caret.classList.add('animate'), 100)
+      })
     },
     onKeydownUserInput(e) {
       this.preventNotAllowedKeys(e);
       if (e.key === 'Escape') this.resetTyping()
+    },
+    debounce(callback, interval = 300) {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(callback, interval);
     },
     resetTyping() {
       this.currentPos = 0
@@ -213,8 +235,21 @@ export default {
     padding: 5px;
   }
 
+  .caret {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 3px;
+    height: 2em;
+    background-color: black;
+    transition: left 200ms ease, top 200ms ease;
+    &.animate {
+      animation: 1s steps(1, start) 1s infinite normal none running caret-blink;
+    }
+  }
+
   .wrapViewer {
-    position: relative;
+    // position: relative;
     width: 80vw;
     max-width: 800px;
     margin: 50px auto 15px auto;
@@ -287,8 +322,7 @@ export default {
       }
     }
     &.error {
-      color: white;
-      background-color: red;
+      color: red;
 
       &.space {
         opacity: 1;
@@ -297,15 +331,11 @@ export default {
     }
     &.active {
       &.space {
-        animation: blink 600ms steps(1, start) infinite;
         &.error:before {
           color: red;
           opacity: 1;
         }
       }
-    }
-    &.active {
-      animation: blink 600ms steps(1, start) infinite;
     }
     &.space {
       color: gray;
@@ -347,6 +377,17 @@ export default {
     100% {
       background-color: transparent;
       color: gray;
+    }
+  }
+  @keyframes caret-blink {
+    0% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
     }
   }
 </style>
