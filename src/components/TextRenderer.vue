@@ -19,7 +19,7 @@
         disabled="disabled"
         autofocus
         @keydown="onKeydownUserInput"
-        @blur="onClickToogleTyping"
+        @blur="onDisableTyping"
       >
       <!-- eslint-disable vue/no-v-html -->
       <div class="wordCountdown">
@@ -49,15 +49,6 @@
     >
       {{ toogleTypingBtnText }}
     </button>
-    <textarea
-      ref="customText"
-      v-model="sourceText"
-      class="customText"
-      :class="{disabled: !disableTyping}"
-      :style="{fontSize: `${fontSize}px`, fontFamily: `${selectedFont}`}"
-      rows="4"
-      cols="50"
-    />
   </div>
 </template>
 
@@ -124,6 +115,7 @@ export default {
   mounted(){
     this.updateCurrentSentence(0)
     this.updateViewer(this.currentSentence)
+    this.onClickToogleTyping()
   },
   methods: {
     ...mapMutations([
@@ -217,23 +209,22 @@ export default {
       }
     },
     onClickToogleTyping() {
-      const { customText, userInput } = this.$refs
+      const { userInput } = this.$refs
       let sentence = this.currentSentence;
       this.resetTyping()
       this.setDisableTyping(!this.disableTyping)
       this.setMenuOpen(false)
       this.updateCurrentSentence(0)
 
-      if(this.disableTyping) {
-        customText.focus()
-        return
-      }
-
       userInput.removeAttribute('disabled')
       userInput.focus()
       sentence = this.showCapitalLetters ? sentence : sentence.toLowerCase();
       this.updateViewer(sentence);
     },
+    onDisableTyping() {
+      this.setDisableTyping(true)
+      this.setMenuOpen(false)
+    }
   },
 }
 </script>
@@ -245,7 +236,7 @@ export default {
   }
 
   table, th, td {
-    border: 1px solid black;
+    border: 1px solid rgb(0, 0, 0);
     border-collapse: collapse;
     font-size: 16px;
   }
@@ -273,7 +264,6 @@ export default {
   }
 
   .wrapViewer {
-    // position: relative;
     width: 80vw;
     max-width: 800px;
     margin: 50px auto 15px auto;
