@@ -19,8 +19,8 @@
         disabled="disabled"
         autofocus
         @keydown="onKeydownUserInput"
+        @blur="onClickToogleTyping"
       >
-      <!-- @blur="onClickToogleTyping" -->
       <!-- eslint-disable vue/no-v-html -->
       <div
         ref="viewer"
