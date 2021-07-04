@@ -5,7 +5,7 @@ export default createStore({
   state: {
     errorCount: 0,
     wordsCount: 0,
-    showCapitalLetters: true,
+    showCapitalLetters: false,
     disableTyping: true,
     value: '',
     sentences: [],
