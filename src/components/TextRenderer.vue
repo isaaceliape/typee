@@ -22,6 +22,9 @@
         @blur="onClickToogleTyping"
       >
       <!-- eslint-disable vue/no-v-html -->
+      <div class="wordCountdown">
+        {{ wordsTyped }} / {{ wordsPerSentence }}
+      </div>
       <div
         ref="viewer"
         class="viewer"
@@ -101,6 +104,9 @@ export default {
     ...mapGetters([
       'getSentencesCount',
     ]),
+    wordsTyped() {
+      return this.value.split(' ').length - 1;
+    },
     toogleTypingBtnText(){
       const action = this.disableTyping ? 'start' : 'stop'
       return `${action} typing`
@@ -246,6 +252,11 @@ export default {
 
   th, td {
     padding: 5px;
+  }
+
+  .wordCountdown {
+    text-align: center;
+    font-size: 1.5rem; 
   }
 
   .caret {
