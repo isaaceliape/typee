@@ -26,8 +26,15 @@
         ref="viewer"
         class="viewer"
         :style="{fontSize: `${fontSize}px`, fontFamily: `${selectedFont}`}"
-        v-html="finalText"
-      />
+      >
+        <Letter
+          v-for="(letter, i) in finalText"
+          :key="i"
+          :text="letter.text"
+          :classes="letter.classes"
+        />
+      </div>
+
       <div
         ref="caret"
         class="caret animate"
@@ -55,7 +62,9 @@
 import * as R from 'ramda'
 import { mapState, mapMutations, mapGetters } from 'vuex'
 
+import Letter from './Letter.vue'
 import InfoPanel from './InfoPanel.vue'
+
 import mostCommonEnglishWords from '../assets/1000EnglishWords'
 
 const mock_data = mostCommonEnglishWords.sort(() => Math.random() - 0.5).join(' ')
@@ -65,13 +74,14 @@ let debounceTimer = null;
 export default {
   components: {
     InfoPanel,
+    Letter,
   },
   data() {
     return {
       currentPos: 0,
       value: '',
       currentSentence: null,
-      finalText: '<span class="active">&nbsp;</span>',
+      finalText: [{ text: '&nbsp;', classes: ['active'] }],
       sourceText: mock_data,
       article: '',
       articleTitle: '',
@@ -150,12 +160,15 @@ export default {
           classes.push(status)
         }
         if (currPosSentenceText === '␣') classes.push('space')
-        const finalLetter = `<span class="${classes.join(' ')}">${finalText}</span>`
+        const finalLetter = {
+          text: finalText,
+          classes,
+        }
         analizedText.push(finalLetter)
       }
       this.updateErrorCount(parsedCurrentSentence, parsedText, currPosLetter)
       this.updateWordsCount(parsedText, currPosLetter)
-      this.finalText = analizedText.join('')
+      this.finalText = analizedText
       this.updateCaretPos();
     },
     updateCaretPos() {
@@ -308,39 +321,6 @@ export default {
     position: relative;
     z-index: 1;
     padding: 10px;
-  }
-
-  .letter {
-    position: relative;
-    display: inline-block;
-
-    &.success {
-      color: #80808063;
-
-      &.space:before {
-        color: black;
-      }
-    }
-    &.error {
-      color: red;
-
-      &.space {
-        opacity: 1;
-        color: white;
-      }
-    }
-    &.active {
-      &.space {
-        &.error:before {
-          color: red;
-          opacity: 1;
-        }
-      }
-    }
-    &.space {
-      color: gray;
-      opacity: 0.3;
-    }
   }
 
   .articleTitle {
