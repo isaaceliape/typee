@@ -1,10 +1,9 @@
 #  ⌨️ Typing Tool
-This project aims to be a tool for practising touch typing where you can use whichever text you want as an initial input.
+This project aims to be a tool for practising touch typing.
 
 ## ⚙️ Features
 * Errors count
 * Words typed counter
-* Integrated The Verge RSS feed
 
 ## 🚀 Demo
 [Live demo](https://isaaceliape.github.io/typing_tool/)
