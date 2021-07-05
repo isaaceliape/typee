@@ -23,7 +23,7 @@
       >
       <!-- eslint-disable vue/no-v-html -->
       <div class="wordCountdown">
-        {{ wordsTyped }} / {{ wordsPerSentence }}
+        {{ wordsCount }} / {{ wordsPerSentence }}
       </div>
       <div
         ref="viewer"
@@ -85,6 +85,7 @@ export default {
     ...mapState([
       'fontSize',
       'sentences',
+      'wordsCount',
       'errorCount',
       'sentencePos',
       'selectedFont',
@@ -95,9 +96,6 @@ export default {
     ...mapGetters([
       'getSentencesCount',
     ]),
-    wordsTyped() {
-      return this.value.split(' ').length - 1;
-    },
     toogleTypingBtnText(){
       const action = this.disableTyping ? 'start' : 'stop'
       return `${action} typing`
@@ -130,10 +128,9 @@ export default {
     updateErrorCount(currentSentence, currentText, currPosLetter) {
       if(currentSentence[currPosLetter] !== currentText[currPosLetter]) this.increaseErrorCount()
     },
-    updateWordsCount(parsedCurrentText, currPosLetter) {
-      const count = parsedCurrentText
-        .substr(0, currPosLetter)
-        .split('␣').length - 1
+    updateWordsCount() {
+      const count = this.value
+        .split(' ').length - 1
       this.setWordsCount(count)
     },
     updateViewer(text) {
