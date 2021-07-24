@@ -66,7 +66,7 @@ export default {
       text-align: center;
       margin-left: 183px;
       &:before {
-        content: 'Typing tool';
+        content: 'Typee';
       }
     }
     &[data-key="F"],
