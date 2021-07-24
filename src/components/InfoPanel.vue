@@ -2,12 +2,10 @@
   <div class="InfoPanel">
     <table>
       <tr>
-        <th>Words</th>
         <th>Errors</th>
         <th>Sentences</th>
       </tr>
       <tr>
-        <td><span class="words">{{ wordsCount }}</span></td>
         <td><span class="errors">{{ errorCount }}</span></td>
         <td><span class="errors">{{ sentencePos + 1 }} of {{ getSentencesCount }}</span></td>
       </tr>
@@ -28,7 +26,6 @@ export default {
         'errorCount',
         'fontSize',
         'sentences',
-        'wordsCount',
         'sentencePos',
         'showCapitalLetters',
       ], store),

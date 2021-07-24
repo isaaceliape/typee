@@ -23,7 +23,7 @@
       >
       <!-- eslint-disable vue/no-v-html -->
       <div class="wordCountdown">
-        {{ wordsTyped }} / {{ wordsPerSentence }}
+        {{ wordsCount }} / {{ wordsPerSentence }}
       </div>
       <div
         ref="viewer"
@@ -43,6 +43,12 @@
         class="caret animate"
       />
     </div>
+
+    <Keymap
+      v-if="!disableTyping"
+      :selected-key="nextLetter"
+    />
+    
     <button
       class="toogleTyping"
       @click="onClickToogleTyping"
@@ -58,6 +64,7 @@ import { mapState, mapMutations, mapGetters } from 'vuex'
 
 import Letter from './Letter.vue'
 import InfoPanel from './InfoPanel.vue'
+import Keymap from './Keymap.vue'
 
 import mostCommonEnglishWords from '../assets/1000EnglishWords'
 
@@ -69,6 +76,7 @@ export default {
   components: {
     InfoPanel,
     Letter,
+    Keymap,
   },
   data() {
     return {
@@ -85,6 +93,7 @@ export default {
     ...mapState([
       'fontSize',
       'sentences',
+      'wordsCount',
       'errorCount',
       'sentencePos',
       'selectedFont',
@@ -95,13 +104,14 @@ export default {
     ...mapGetters([
       'getSentencesCount',
     ]),
-    wordsTyped() {
-      return this.value.split(' ').length - 1;
-    },
     toogleTypingBtnText(){
       const action = this.disableTyping ? 'start' : 'stop'
       return `${action} typing`
     },
+    nextLetter() {
+      console.log('nextLetter', this.currentSentence[this.value.length])
+      return this.currentSentence[this.value.length];
+    }
   },
   watch: {
     value(currentText) {
@@ -130,10 +140,9 @@ export default {
     updateErrorCount(currentSentence, currentText, currPosLetter) {
       if(currentSentence[currPosLetter] !== currentText[currPosLetter]) this.increaseErrorCount()
     },
-    updateWordsCount(parsedCurrentText, currPosLetter) {
-      const count = parsedCurrentText
-        .substr(0, currPosLetter)
-        .split('␣').length - 1
+    updateWordsCount() {
+      const count = this.value
+        .split(' ').length - 1
       this.setWordsCount(count)
     },
     updateViewer(text) {
@@ -184,7 +193,7 @@ export default {
     },
     onKeydownUserInput(e) {
       this.preventNotAllowedKeys(e);
-      if (e.key === 'Escape') this.resetTyping()
+      if (e.key === 'Tab') this.resetTyping()
     },
     debounce(callback, interval = 300) {
       clearTimeout(debounceTimer);
@@ -322,6 +331,7 @@ export default {
     position: relative;
     z-index: 1;
     padding: 10px;
+    text-align: center;
   }
 
   .articleTitle {
