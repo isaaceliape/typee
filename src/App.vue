@@ -10,7 +10,7 @@ import { mapState, mapMutations } from 'vuex'
 import { updateSelectedFont } from './helpers.js'
 
 import Menu from './components/Menu.vue'
-import TextRenderer from './components/TextRenderer'
+import TextRenderer from './components/TextRenderer.vue'
 
 export default {
   name: 'App',

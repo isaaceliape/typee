@@ -43,6 +43,12 @@
         class="caret animate"
       />
     </div>
+
+    <Keymap
+      v-if="!disableTyping"
+      :selected-key="nextLetter"
+    />
+    
     <button
       class="toogleTyping"
       @click="onClickToogleTyping"
@@ -58,6 +64,7 @@ import { mapState, mapMutations, mapGetters } from 'vuex'
 
 import Letter from './Letter.vue'
 import InfoPanel from './InfoPanel.vue'
+import Keymap from './Keymap.vue'
 
 import mostCommonEnglishWords from '../assets/1000EnglishWords'
 
@@ -69,6 +76,7 @@ export default {
   components: {
     InfoPanel,
     Letter,
+    Keymap,
   },
   data() {
     return {
@@ -100,6 +108,10 @@ export default {
       const action = this.disableTyping ? 'start' : 'stop'
       return `${action} typing`
     },
+    nextLetter() {
+      console.log('nextLetter', this.currentSentence[this.value.length])
+      return this.currentSentence[this.value.length];
+    }
   },
   watch: {
     value(currentText) {
@@ -181,7 +193,7 @@ export default {
     },
     onKeydownUserInput(e) {
       this.preventNotAllowedKeys(e);
-      if (e.key === 'Escape') this.resetTyping()
+      if (e.key === 'Tab') this.resetTyping()
     },
     debounce(callback, interval = 300) {
       clearTimeout(debounceTimer);
