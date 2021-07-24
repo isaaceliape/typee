@@ -1,10 +1,11 @@
 <template>
-  <div
+  <span
     class="Letter"
     :class="classes"
   >
     {{ text }}
-  </div>
+  </span>
+  <wbr v-if="text === '␣'">
 </template>
 
 <script>
@@ -25,7 +26,6 @@ export default {
 <style lang="scss" scoped>
   .Letter {
     position: relative;
-    display: inline-block;
 
     &.success {
       color: #80808063;
