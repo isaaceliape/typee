@@ -1,4 +1,4 @@
-#  ⌨️ Typing Tool
+#  ⌨️ Typee
 This project aims to be a tool for practising touch typing.
 
 ## ⚙️ Features
