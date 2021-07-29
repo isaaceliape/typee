@@ -43,9 +43,6 @@ export default {
 </script>
 <style lang="scss" scoped>
   .Keymap {
-    border-radius: 3px;
-    border: 1px solid black ;
-    padding: 10px;
     width: 687px;
     margin: 0 auto 40px auto;
   }
