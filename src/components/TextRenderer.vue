@@ -18,7 +18,6 @@
         class="userInput"
         disabled="disabled"
         autofocus
-        @keydown="onKeydownUserInput"
         @blur="onDisableTyping"
       >
       <!-- eslint-disable vue/no-v-html -->
@@ -70,7 +69,7 @@ import mostCommonEnglishWords from '../assets/1000EnglishWords'
 
 const mock_data = mostCommonEnglishWords.sort(() => Math.random() - 0.5).join(' ')
 const NOT_ALLOWED_KEYS = ['ArrowLeft','ArrowRight','Tab']
-let debounceTimer = null;
+let debounceTimer = null
 
 export default {
   components: {
@@ -109,8 +108,7 @@ export default {
       return `${action} typing`
     },
     nextLetter() {
-      console.log('nextLetter', this.currentSentence[this.value.length])
-      return this.currentSentence[this.value.length];
+      return this.currentSentence[this.value.length]
     }
   },
   watch: {
@@ -176,28 +174,29 @@ export default {
       this.updateErrorCount(parsedCurrentSentence, parsedText, currPosLetter)
       this.updateWordsCount(parsedText, currPosLetter)
       this.finalText = analizedText
-      this.updateCaretPos();
+      this.updateCaretPos()
     },
     updateCaretPos() {
       this.$nextTick(() => {
-        const activeLetterEl = document.querySelector('.viewer .active');
-        const caret = document.querySelector('.caret');
-        caret.classList.remove('animate');
-        if (!activeLetterEl) return; 
-        const { y, x } = activeLetterEl.getBoundingClientRect();
+        const activeLetterEl = document.querySelector('.viewer .active')
+        const caret = document.querySelector('.caret')
+        caret.classList.remove('animate')
+        if (!activeLetterEl) return 
+        const { y, x } = activeLetterEl.getBoundingClientRect()
         const topExtaPixels = (y / 100) * 2
-        caret.style.left = `${x - 1}px`;
-        caret.style.top = `${y + topExtaPixels}px`;
+        caret.style.left = `${x - 1}px`
+        caret.style.top = `${y + topExtaPixels}px`
         this.debounce(() => caret.classList.add('animate'), 100)
       })
     },
-    onKeydownUserInput(e) {
-      this.preventNotAllowedKeys(e);
+    onKeydown(e) {
+      this.preventNotAllowedKeys(e)
+      if (this.value === '') return
       if (e.key === 'Tab') this.resetTyping()
     },
     debounce(callback, interval = 300) {
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(callback, interval);
+      clearTimeout(debounceTimer)
+      debounceTimer = setTimeout(callback, interval)
     },
     resetTyping() {
       this.currentPos = 0
@@ -219,7 +218,7 @@ export default {
     },
     onClickToogleTyping() {
       const { userInput } = this.$refs
-      let sentence = this.currentSentence;
+      let sentence = this.currentSentence
       this.resetTyping()
       this.setDisableTyping(!this.disableTyping)
       this.setMenuOpen(false)
@@ -227,12 +226,14 @@ export default {
 
       userInput.removeAttribute('disabled')
       userInput.focus()
-      sentence = this.showCapitalLetters ? sentence : sentence.toLowerCase();
-      this.updateViewer(sentence);
+      sentence = this.showCapitalLetters ? sentence : sentence.toLowerCase()
+      this.updateViewer(sentence)
+      this.keydownEvent = document.addEventListener('keydown', this.onKeydown)
     },
     onDisableTyping() {
       this.setDisableTyping(true)
       this.setMenuOpen(false)
+      document.removeEventListener('keydown', this.onKeydown)
     }
   },
 }
