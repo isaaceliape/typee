@@ -6,7 +6,7 @@ This project aims to be a tool for practising touch typing.
 * Words typed counter
 
 ## 🚀 Demo
-[Live demo](https://isaaceliape.github.io/typing_tool/)
+Live demo [isaaceliape.github.io/typee](https://isaaceliape.github.io/typee)
 
 ![Example](https://raw.githubusercontent.com/isaaceliape/typing_tool/master/src/assets/example.png)
 
