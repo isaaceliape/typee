@@ -1,6 +1,11 @@
+import "es6-promise/auto";
 import { createApp } from "vue";
+import VueHead from "vue-head";
 import App from "./App.vue";
 import "./registerServiceWorker";
-import store from "./store";
+import AppStore from "./store/AppStore";
 
-createApp(App).use(store).mount("#app");
+const app = createApp(App);
+app.use(AppStore);
+app.use(VueHead);
+app.mount("#app");

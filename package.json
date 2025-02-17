@@ -10,9 +10,15 @@
   },
   "dependencies": {
     "core-js": "^3.6.5",
+    "pascal-case": "^3.1.2",
+    "ramda": "^0.27.1",
     "register-service-worker": "^1.7.1",
     "vue": "^3.0.0",
-    "vuex": "^4.0.0-0"
+    "vue-head": "^2.2.0",
+    "vuex": "^4.0.0-0",
+    "es6-promise": "^4.2.8",
+    "vue-loader": "^16.2.0",
+    "vuex-persistedstate": "^4.0.0-beta.1"
   },
   "devDependencies": {
     "@types/jest": "^24.0.19",
