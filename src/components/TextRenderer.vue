@@ -75,7 +75,6 @@ interface LetterData {
 
 const mock_data = mostCommonEnglishWords.sort(() => Math.random() - 0.5).join(' ')
 const NOT_ALLOWED_KEYS = ['ArrowLeft','ArrowRight','Tab']
-let debounceTimer: number | null = null
 
 export default defineComponent({
   components: {
@@ -93,6 +92,7 @@ export default defineComponent({
       article: '',
       articleTitle: '',
       onKeydownHandler: null as ((e: KeyboardEvent) => void) | null,
+      debounceTimer: null as number | null,
     }
   },
   computed: {
@@ -201,10 +201,10 @@ export default defineComponent({
       if (this.value === '') return
       if (e.key === 'Tab') this.resetTyping()
     },
-    debounce(callback: () => void, interval = 300): void {
-      if (debounceTimer) clearTimeout(debounceTimer)
-      debounceTimer = setTimeout(callback, interval)
-    },
+     debounce(callback: () => void, interval = 300): void {
+       if (this.debounceTimer) clearTimeout(this.debounceTimer)
+       this.debounceTimer = setTimeout(callback, interval)
+     },
     resetTyping(): void {
       this.currentPos = 0
       this.value = ''
