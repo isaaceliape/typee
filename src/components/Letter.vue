@@ -33,7 +33,7 @@ export default defineComponent({
       color: #80808063;
 
       &.space:before {
-        color: black;
+        color: var(--text-color);
       }
     }
     &.error {

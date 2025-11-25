@@ -54,15 +54,17 @@ export default defineComponent({
   }
   .key {
     border-radius: 3px;
-    border: 1px solid black ;
+    border: 1px solid var(--border-color);
     padding: 10px 25px;
     margin: 3px;
     display: inline-block;
-    transition: background-color 100ms ease-in;
+    transition: background-color 100ms ease-in, border-color 0.3s ease, color 0.3s ease;
+    background-color: var(--bg-color);
+    color: var(--text-color);
 
     &.active {
-      background-color: black;
-      color: white;
+      background-color: var(--button-hover-bg);
+      color: var(--button-hover-text);
     }
     &[data-key=" "]{
       width: 280px;
@@ -84,8 +86,8 @@ export default defineComponent({
         transform: translateX(-50%);
       }
       &.active {
-        background-color: black;
-        color: white;
+        background-color: var(--button-hover-bg);
+        color: var(--button-hover-text);
       }
     }
   }

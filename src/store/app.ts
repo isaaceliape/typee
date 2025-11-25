@@ -37,6 +37,7 @@ export const useAppStore = defineStore('app', () => {
   ])
   const articleTitle = ref('Amelia KralesA global phishing')
   const fontSize = ref(30)
+  const darkMode = ref(false)
 
   // Getters
   const getSentencesCount = computed(() => sentences.value.length)
@@ -114,6 +115,29 @@ export const useAppStore = defineStore('app', () => {
     fontSize.value = payload
   }
 
+  const toggleDarkMode = () => {
+    darkMode.value = !darkMode.value
+    // Save to localStorage
+    localStorage.setItem('darkMode', JSON.stringify(darkMode.value))
+  }
+
+  const setDarkMode = (payload: boolean) => {
+    darkMode.value = payload
+    // Save to localStorage
+    localStorage.setItem('darkMode', JSON.stringify(darkMode.value))
+  }
+
+  const initializeDarkMode = () => {
+    // Check localStorage first
+    const savedDarkMode = localStorage.getItem('darkMode')
+    if (savedDarkMode !== null) {
+      darkMode.value = JSON.parse(savedDarkMode)
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      // Fall back to system preference if no saved preference
+      darkMode.value = true
+    }
+  }
+
   return {
     // State
     errorCount,
@@ -132,6 +156,7 @@ export const useAppStore = defineStore('app', () => {
     fonts,
     articleTitle,
     fontSize,
+    darkMode,
 
     // Getters
     getSentencesCount,
@@ -155,5 +180,8 @@ export const useAppStore = defineStore('app', () => {
     setFinalText,
     setArticleTitle,
     setFontSize,
+    toggleDarkMode,
+    setDarkMode,
+    initializeDarkMode,
   }
 })

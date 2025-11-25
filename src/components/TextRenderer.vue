@@ -293,9 +293,10 @@ export default defineComponent({
   }
 
   table, th, td {
-    border: 1px solid rgb(0, 0, 0);
+    border: 1px solid var(--border-color);
     border-collapse: collapse;
     font-size: 16px;
+    color: var(--text-color);
   }
 
   th, td {
@@ -304,7 +305,8 @@ export default defineComponent({
 
   .wordCountdown {
     text-align: center;
-    font-size: 1.5rem; 
+    font-size: 1.5rem;
+    color: var(--text-color);
   }
 
   .caret {
@@ -313,8 +315,8 @@ export default defineComponent({
     top: 0;
     width: 3px;
     height: 2em;
-    background-color: black;
-    transition: left 200ms ease, top 200ms ease;
+    background-color: var(--text-color);
+    transition: left 200ms ease, top 200ms ease, background-color 0.3s ease;
     &.animate {
       animation: 1s steps(1, start) 1s infinite normal none running caret-blink;
     }
@@ -341,9 +343,11 @@ export default defineComponent({
     display: block;
     line-height: 1.2em;
     width: 100%;
-    color: black;
+    color: var(--text-color);
+    background-color: var(--bg-color);
     box-sizing: border-box;
     border-radius: 5px;
+    transition: color 0.3s ease, background-color 0.3s ease;
   }
 
   .userInput {
@@ -366,6 +370,8 @@ export default defineComponent({
     height: 20vh;
     opacity: 1;
     outline: none;
+    color: var(--text-color);
+    background-color: var(--bg-color);
 
     &.disabled {
       height: 0;
@@ -375,7 +381,7 @@ export default defineComponent({
   }
   .viewer {
     pointer-events: none;
-    color: black;
+    color: var(--text-color);
     position: relative;
     z-index: 1;
     padding: 10px;
@@ -386,11 +392,14 @@ export default defineComponent({
     max-width: 800px;
     margin: 25px auto 0 auto;
     text-align: center;
+    color: var(--text-color);
+    transition: color 0.3s ease;
   }
 
   .toogleTyping {
-    border: 1px solid black;
-    background: #fff;
+    border: 1px solid var(--border-color);
+    background: var(--bg-color);
+    color: var(--text-color);
     border-radius: 3px;
     padding: 5px 10px;
     margin: 0 auto;
@@ -398,9 +407,10 @@ export default defineComponent({
     font-size: 20px;
     outline: 0;
     cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
     &:hover {
-      background-color: black;
-      color: white;
+      background-color: var(--button-hover-bg);
+      color: var(--button-hover-text);
       border-color: transparent;
     }
   }
@@ -410,8 +420,8 @@ export default defineComponent({
       color: gray;
     }
     50% {
-      background-color: black;
-      color: white;
+      background-color: var(--text-color);
+      color: var(--bg-color);
     }
     100% {
       background-color: transparent;
