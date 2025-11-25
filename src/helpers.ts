@@ -3,9 +3,10 @@ import { computed, type ComputedRef } from 'vue'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 /**
- * Creates Vue mutation functions that update state properties.
+ * Creates state update functions that modify state properties.
  * Automatically generates setters for the provided property names.
  * 
+ * @deprecated This is a legacy helper from the Vuex migration. Prefer Pinia stores.
  * @param properties - Array of property names to create mutations for
  * @returns Object containing setter functions for each property in PascalCase
  * 
@@ -26,7 +27,7 @@ const mutationFactory = (properties: string[]): Record<string, (state: Record<st
  * Provides reactive access to store state in components.
  * 
  * @param items - Array of state property names to map
- * @param store - The Vuex store instance
+ * @param store - The store instance
  * @returns Object with computed property accessors for each state item
  * 
  * @example

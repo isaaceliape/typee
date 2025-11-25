@@ -19,7 +19,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'vendor': ['vue', 'vuex', 'vue-head'],
+          'vendor': ['vue', 'pinia', 'vue-head'],
         }
       }
     }
