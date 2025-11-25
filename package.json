@@ -4,10 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vite build && npm run copy-assets",
+    "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext .vue,.js,.ts,.jsx,.tsx",
-    "copy-assets": "sh bin/clear_assets.sh && cp dist/index.html . && cp dist/css/* css/ 2>/dev/null; cp dist/js/* js/ 2>/dev/null; true"
+    "lint": "eslint . --ext .vue,.js,.ts,.jsx,.tsx"
   },
   "dependencies": {
     "core-js": "^3.6.5",
