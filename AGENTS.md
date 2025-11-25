@@ -21,21 +21,28 @@ For testing strategies and coverage requirements: @test/testing-guidelines.md
 
 Read the following file immediately as it's relevant to all workflows: @rules/general-guidelines.md
 
-## Kanban Board
-The **Typee Kanban board** is the single source of truth for project status, priorities, and task assignments. Always:
-- Check the Kanban board before starting work to understand current priorities
-- Refer to the board to understand task context, dependencies, and acceptance criteria
-- Use the board to coordinate with other team members and avoid duplicate work
-- Update task status on the board as work progresses
+## GitHub Issues
 
-To view the Kanban board, use: `sh tools/list-kanban-board.sh` or `sh tools/project-status-dashboard.sh`
+The **GitHub Issues** is the single source of truth for project status, priorities, and task assignments. Always:
+- Check GitHub Issues before starting work to understand current priorities
+- Refer to issues to understand task context, dependencies, and acceptance criteria
+- Use issues to coordinate with other team members and avoid duplicate work
+- Update issue status and labels as work progresses
+
+To manage issues, use the tools in `tools/` directory:
+- `./tools/get-issue-by-id.sh <number>` - View specific issue details
+- `./tools/get-all-issues.sh [options]` - List and filter issues
+- `./tools/update-issue-by-id.sh <number> [options]` - Modify issue properties
+- `./tools/remove-issue-by-id.sh <number> [options]` - Close issues
+
+See `tools/README.md` for full documentation and examples.
 
 ## Commands
 - **Dev**: `npm run dev` - Start Vite development server (http://localhost:5173/)
 - **Build**: `npm run build` - Build for production using Vite
 - **Preview**: `npm run preview` - Preview production build locally (http://localhost:4173/)
 - **Lint**: `npm run lint` - Run ESLint checks
-- **Test**: No tests configured yet; add Vitest for unit tests. Run single test: `npm test -- <test-file>`
+- **Test**: `npm test` - Run Vitest tests. Run single test: `npm test -- <test-file>`
 
 ## Build System
 This project uses **Vite** for fast development and production builds (migrated from Vue CLI).
@@ -52,11 +59,11 @@ Always update **README.md** after implementing new features to:
 - Keep the README current and accurate for users and developers
 
 ## Code Style Guidelines
-- **Imports**: Use ES6 imports; group by type (Vuex, helpers, components)
-- **Naming**: camelCase for variables/functions, PascalCase for components/mutations
+- **Imports**: Use ES6 imports; group by type (Pinia, helpers, components)
+- **Naming**: camelCase for variables/functions, PascalCase for components/store actions
 - **Formatting**: 2-space indentation; no semicolons; single quotes
-- **Types**: Add TypeScript types after migration; use interfaces for complex objects
+- **Types**: Use TypeScript types; use interfaces for complex objects
 - **Error Handling**: Use try/catch for async operations; log errors to console
-- **Vue Components**: Use Options API; computed for derived state; methods for actions
-- **Store**: camelCase state properties; getters prefixed with 'get'; mutations as 'setProperty' or 'toggleProperty'
+- **Vue Components**: Use Composition API with `<script setup>`; computed for derived state; functions for actions
+- **Store (Pinia)**: camelCase state properties; getters as computed properties; actions for mutations
 - **Styling**: SCSS in components; avoid global styles; use BEM-like class naming

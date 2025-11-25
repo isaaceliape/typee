@@ -1,14 +1,15 @@
 # Typee Project Tools
 
-Collection of shell scripts to manage and monitor the Typee project using the GitHub CLI (gh).
+Collection of shell scripts to manage GitHub issues for the Typee project using the GitHub CLI (gh).
 
 ## Overview
 
-These tools provide command-line access to project management functionality:
+These tools provide command-line access to GitHub Issues management functionality:
 
-- **Get Kanban User Story Details** - Retrieve specific issue information
-- **List Kanban Board Items** - View all project board items
-- **Project Status Dashboard** - Comprehensive project health overview
+- **Get Issue by ID** - Retrieve specific issue information
+- **Get All Issues** - List all GitHub issues with filtering and formatting
+- **Update Issue by ID** - Modify issue properties (title, body, labels, state, assignees)
+- **Remove Issue by ID** - Close issues
 
 ## Prerequisites
 
@@ -24,29 +25,29 @@ These tools provide command-line access to project management functionality:
 
 ## Scripts
 
-### 1. get-kanban-user-story.sh
+### 1. get-issue-by-id.sh
 
-Retrieve detailed information about a specific GitHub issue/user story.
+Retrieve detailed information about a specific GitHub issue by its number.
 
 **Usage:**
 ```bash
-./get-kanban-user-story.sh <issue_number> [format]
+./get-issue-by-id.sh <issue_number> [format]
 ```
 
 **Arguments:**
 - `issue_number` (required): GitHub issue number
-- `format` (optional): Output format - `json`, `table`, or `text` (default: `text`)
+- `format` (optional): Output format - `json`, `text`, or `table` (default: `text`)
 
 **Examples:**
 ```bash
-# Get EPIC #27 in text format (default)
-./get-kanban-user-story.sh 27
+# Get issue #26 in text format (default)
+./get-issue-by-id.sh 26
 
 # Get issue #25 as JSON
-./get-kanban-user-story.sh 25 json
+./get-issue-by-id.sh 25 json
 
-# Get issue #26 as formatted table
-./get-kanban-user-story.sh 26 table
+# Get issue #27 as formatted table
+./get-issue-by-id.sh 27 table
 ```
 
 **Output Formats:**
@@ -56,176 +57,201 @@ Retrieve detailed information about a specific GitHub issue/user story.
 
 **Sample Output (text format):**
 ```
-══════════════════════════════════════════════════════════
-Issue #27
-══════════════════════════════════════════════════════════
+════════════════════════════════════════════════════════
+Issue #26
 
 Title:
-  EPIC: Typee Application Progress Monitoring & Continuous Improvement
+  Add unit tests for Vue components
 
 Status:
-  🟢 OPEN
+  OPEN
 
 Details:
-  URL: https://github.com/isaaceliape/typee/issues/27
-  Created: 2025-11-25
-  Updated: 2025-11-25
+  URL: https://github.com/isaaceliape/typee/issues/26
+  Created: 2025-11-25T10:30:00Z
+  Updated: 2025-11-25T14:45:00Z
   Assignees: None
-  Labels: None
-  Milestone: None
+  Labels: enhancement
 
 Description:
-  Track and monitor the progress of the Typee application...
+  Write comprehensive unit tests for all Vue components...
+════════════════════════════════════════════════════════
 ```
 
 ---
 
-### 2. list-kanban-board.sh
+### 2. get-all-issues.sh
 
-List all items on the Typee Kanban board with filtering options.
+List all GitHub issues with filtering, sorting, and formatting options.
 
 **Usage:**
 ```bash
-./list-kanban-board.sh [options]
+./get-all-issues.sh [options]
 ```
 
 **Options:**
 - `-h, --help`: Show help message
+- `-s, --state <STATE>`: Filter by state: `open`, `closed`, `all` (default: `open`)
+- `-l, --labels <LABELS>`: Filter by labels (comma-separated)
+- `-a, --assignee <USER>`: Filter by assignee username
 - `-j, --json`: Output as JSON
 - `-c, --csv`: Output as CSV
-- `-s, --status <STATUS>`: Filter by status (OPEN, CLOSED, DRAFT)
-- `-t, --type <TYPE>`: Filter by type (issue, pullrequest, draft)
+- `-t, --table`: Output as table (default)
+- `-L, --limit <NUMBER>`: Limit results to N issues (default: 100)
+- `--sort <FIELD>`: Sort by: `created`, `updated`, `comments` (default: `updated`)
 
 **Examples:**
 ```bash
-# List all items (default table format)
-./list-kanban-board.sh
+# List all open issues (default)
+./get-all-issues.sh
 
-# Output as JSON
-./list-kanban-board.sh --json
+# List all closed issues
+./get-all-issues.sh --state closed
 
-# Only show open issues
-./list-kanban-board.sh --status OPEN
+# Filter by labels
+./get-all-issues.sh --labels "bug,enhancement" --json
 
-# Output as CSV
-./list-kanban-board.sh --csv
+# Filter by assignee
+./get-all-issues.sh --assignee isaaceliape --csv
 
-# Combine filters: open items as JSON
-./list-kanban-board.sh -s OPEN -j
+# Combine filters
+./get-all-issues.sh --limit 50 --sort created --state open
+
+# Export as CSV with specific labels
+./get-all-issues.sh --labels "priority-high" --csv > high_priority.csv
 ```
 
 **Sample Output (table format):**
 ```
-Type   | Title                                            | #
--------|----------------------------------------------|-----
-Issue  | EPIC: Typee Application Progress Monitoring...  | 27
-Issue  | Migrate from Vuex to Pinia                     | 25
-Issue  | Add unit tests for Vue components              | 26
-Issue  | Showing errors after blurring field            | 8
+════════════════════════════════════════════════════════════════════════════════
+  #27 [OPEN]
+  EPIC: Typee Application Progress Monitoring & Continuous Improvement
+  Updated: 2025-11-25T09:30:00Z | Assignees: None
 
-✅ Found 4 items on the Kanban board
-```
+  #26 [OPEN]
+  Add unit tests for Vue components
+  Updated: 2025-11-25T14:45:00Z | Assignees: None
 
-**CSV Format Example:**
-```csv
-Type,Title,Number,Repository
-"Issue","EPIC: Typee Application Progress Monitoring...","27","isaaceliape/typee"
-"Issue","Migrate from Vuex to Pinia","25","isaaceliape/typee"
-"Issue","Add unit tests for Vue components","26","isaaceliape/typee"
-"Issue","Showing errors after blurring field","8","isaaceliape/typee"
+  #25 [OPEN]
+  Migrate from Vuex to Pinia
+  Updated: 2025-11-25T12:15:00Z | Assignees: None
+
+════════════════════════════════════════════════════════════════════════════════
+✅ Found 3 issues
 ```
 
 ---
 
-### 3. project-status-dashboard.sh
+### 3. update-issue-by-id.sh
 
-Display a comprehensive dashboard of project status including build, tests, issues, and metrics.
+Update GitHub issue properties (title, body, labels, state, assignees).
 
 **Usage:**
 ```bash
-./project-status-dashboard.sh [options]
+./update-issue-by-id.sh <issue_number> [options]
 ```
+
+**Arguments:**
+- `issue_number` (required): GitHub issue number
 
 **Options:**
 - `-h, --help`: Show help message
-- `-f, --full`: Show full detailed report
-- `-q, --quick`: Show quick summary only
-- `-w, --watch`: Watch mode (auto-update every 10 seconds)
-- `-o, --output <FILE>`: Save output to file
+- `-t, --title <TITLE>`: Update issue title
+- `-b, --body <BODY>`: Update issue description
+- `-s, --state <STATE>`: Update state: `open` or `closed`
+- `-l, --labels <LABELS>`: Update labels (comma-separated, replaces existing)
+- `-a, --assignee <USER>`: Add assignee username
+- `-u, --unassign`: Remove all assignees
+- `--add-label <LABEL>`: Add a single label (without replacing others)
+- `--remove-label <LABEL>`: Remove a single label
+- `-d, --dry-run`: Show what would be changed without applying
 
 **Examples:**
 ```bash
-# Show default dashboard
-./project-status-dashboard.sh
+# Close an issue
+./update-issue-by-id.sh 26 --state closed
 
-# Show full detailed report
-./project-status-dashboard.sh --full
+# Update title and body
+./update-issue-by-id.sh 25 --title "New title" --body "New description"
 
-# Auto-update mode (refreshes every 10 seconds)
-./project-status-dashboard.sh --watch
+# Update labels (replaces all existing labels)
+./update-issue-by-id.sh 27 --labels "epic,priority-high"
 
-# Save dashboard to file
-./project-status-dashboard.sh -o status.txt
+# Assign to user
+./update-issue-by-id.sh 8 --assignee isaaceliape
 
-# Quick summary only
-./project-status-dashboard.sh --quick
+# Add a single label
+./update-issue-by-id.sh 26 --add-label "in-progress"
+
+# Preview changes without applying
+./update-issue-by-id.sh 26 --dry-run --state closed --labels "bug,verified"
+
+# Remove a label
+./update-issue-by-id.sh 25 --remove-label "needs-review"
 ```
 
 **Sample Output:**
 ```
-╔════════════════════════════════════════════════════════╗
-║ Typee Project Status Dashboard
-╚════════════════════════════════════════════════════════╝
+ℹ️  Fetching current issue #26...
+ℹ️  Updating title...
+✅ Title updated
+ℹ️  Updating state to closed...
+✅ State updated to closed
 
-━━━ 📊 Project Overview ━━━
+✅ Issue #26 updated successfully
+```
 
-Repository:  isaaceliape/typee
-Project:     Typee Kanban board (Private)
-Updated:     2025-11-25 09:30:15
+---
 
-━━━ 🚦 Build & Quality Status ━━━
+### 4. remove-issue-by-id.sh
 
-Linting: ✅ PASSING
-Tests:   ✅ PASSING
-Build:   ✅ PASSING
+Close a GitHub issue (marks as closed; can be reopened if needed).
 
-━━━ 📋 GitHub Issues Status ━━━
+**Usage:**
+```bash
+./remove-issue-by-id.sh <issue_number> [options]
+```
 
-Total Issues:  27
-Open:          11
-Closed:        16
+**Arguments:**
+- `issue_number` (required): GitHub issue number
 
-━━━ 🎯 Kanban Board Items ━━━
+**Options:**
+- `-h, --help`: Show help message
+- `-r, --reason <REASON>`: Closing reason/comment (optional)
+- `-d, --dry-run`: Show what would be done without applying
+- `-f, --force`: Skip confirmation prompt
 
-Total Items:   4
+**Examples:**
+```bash
+# Close an issue (with confirmation)
+./remove-issue-by-id.sh 26
 
-Type       Title                                          Number
-========== ==================================================== ==========
-Issue      EPIC: Typee Application Progress Monitor...  27
-Issue      Migrate from Vuex to Pinia                  25
-Issue      Add unit tests for Vue components            26
-Issue      Showing errors after blurring field         8
+# Close with a reason
+./remove-issue-by-id.sh 26 --reason "Completed"
 
-━━━ 📈 Recent Activity ━━━
+# Preview what would happen
+./remove-issue-by-id.sh 26 --dry-run
 
-Recent commits are displayed here...
+# Close without confirmation
+./remove-issue-by-id.sh 26 --force --reason "Duplicate"
+```
 
-━━━ 📚 Documentation ━━━
+**Sample Output:**
+```
+ℹ️  Fetching issue #26...
+════════════════════════════════════════════════════════════
+Issue #26
+Title: Add unit tests for Vue components
+State: OPEN
+URL: https://github.com/isaaceliape/typee/issues/26
+════════════════════════════════════════════════════════════
 
-Specifications available in spec/ directory:
-  • EPIC-progress-monitoring.md
-  • project-completion-summary.md
-  • dependency-upgrade-plan.md
-  • code-review-typescript-best-practices.md
+Close issue #26? (y/N): y
+ℹ️  Closing issue #26...
+ℹ️  Adding closing comment...
 
-━━━ 🔧 Tools Available ━━━
-
-Tools in tools/ directory:
-  • get-kanban-user-story.sh
-  • list-kanban-board.sh
-  • project-status-dashboard.sh
-
-════════════════════════════════════════════════════════
+✅ Issue #26 closed successfully
+ℹ️  To reopen: gh issue reopen 26 --repo isaaceliape/typee
 ```
 
 ---
@@ -234,53 +260,71 @@ Tools in tools/ directory:
 
 ### Workflow 1: Check Specific Issue Status
 ```bash
-# Get details on the EPIC
-./get-kanban-user-story.sh 27
+# Get details on an issue
+./get-issue-by-id.sh 26
 
-# Check Pinia migration issue
-./get-kanban-user-story.sh 25 json | jq '.body'
+# Get issue details as JSON for processing
+./get-issue-by-id.sh 26 json | jq '.body'
 
-# Export issue as JSON for processing
-./get-kanban-user-story.sh 26 json > issue_26.json
+# Export issue as JSON
+./get-issue-by-id.sh 26 json > issue_26.json
 ```
 
-### Workflow 2: Monitor Project Health
+### Workflow 2: List and Filter Issues
 ```bash
-# View all board items
-./list-kanban-board.sh
+# View all open issues
+./get-all-issues.sh
 
-# Get dashboard overview
-./project-status-dashboard.sh
+# List all closed issues
+./get-all-issues.sh --state closed
 
-# Auto-update every 10 seconds
-./project-status-dashboard.sh --watch
+# Get issues with specific labels
+./get-all-issues.sh --labels "bug,priority-high"
 
 # Export board status to CSV for reporting
-./list-kanban-board.sh --csv > board_status.csv
+./get-all-issues.sh --csv > board_status.csv
 ```
 
-### Workflow 3: Filter and Report
+### Workflow 3: Update Issue Properties
 ```bash
-# List only open issues
-./list-kanban-board.sh --status OPEN
+# Close an issue
+./update-issue-by-id.sh 26 --state closed
 
-# Export open issues as JSON
-./list-kanban-board.sh --status OPEN --json
+# Update title and add labels
+./update-issue-by-id.sh 25 --title "Updated title" --labels "enhancement,in-progress"
 
-# Save daily status report
-./project-status-dashboard.sh -f -o daily_status_$(date +%Y-%m-%d).txt
+# Assign to user and add label
+./update-issue-by-id.sh 8 --assignee isaaceliape --add-label "assigned"
+
+# Preview changes before applying
+./update-issue-by-id.sh 26 --dry-run --state closed --labels "bug,verified"
 ```
 
-### Workflow 4: CI/CD Integration
+### Workflow 4: Manage Issues
 ```bash
-# Check project health before deployment
-./project-status-dashboard.sh > /tmp/status.txt
+# Close an issue with confirmation
+./remove-issue-by-id.sh 26
 
-# Get specific issue data for automation
-./get-kanban-user-story.sh 27 json | jq -r '.title'
+# Close multiple issues without confirmation
+./remove-issue-by-id.sh 1 --force --reason "Duplicate"
+./remove-issue-by-id.sh 2 --force --reason "Invalid"
 
-# Export board to CSV for tracking
-./list-kanban-board.sh --csv > /tmp/board_snapshot.csv
+# Close issue with reason comment
+./remove-issue-by-id.sh 26 --force --reason "Completed - merged in PR #123"
+```
+
+### Workflow 5: Bulk Operations with JSON Output
+```bash
+# Get all open issues, extract numbers, and update them
+./get-all-issues.sh --json | jq -r '.[].number' | while read num; do
+  ./update-issue-by-id.sh "$num" --add-label "reviewed"
+done
+
+# Export specific issues to CSV for reporting
+./get-all-issues.sh --labels "priority-high" --state open --csv > high_priority_open.csv
+
+# Get all issues assigned to a user as JSON
+./get-all-issues.sh --assignee isaaceliape --json | jq '.'
 ```
 
 ---
@@ -298,38 +342,55 @@ chmod +x *.sh
 export PATH="$PATH:$(pwd)"
 
 # Or create symlinks in /usr/local/bin
-ln -s $(pwd)/get-kanban-user-story.sh /usr/local/bin/get-kanban-story
+ln -s $(pwd)/get-issue-by-id.sh /usr/local/bin/get-issue
+ln -s $(pwd)/get-all-issues.sh /usr/local/bin/get-issues
+ln -s $(pwd)/update-issue-by-id.sh /usr/local/bin/update-issue
+ln -s $(pwd)/remove-issue-by-id.sh /usr/local/bin/close-issue
 ```
 
 ### 3. Use jq for Complex Queries
 ```bash
-# Get all open issues
-./get-kanban-user-story.sh 27 json | jq '.labels'
+# Get all open issues and extract titles
+./get-all-issues.sh --state open --json | jq -r '.[].title'
 
-# Extract specific fields
-./list-kanban-board.sh --json | jq '.[].number'
+# Filter issues by label and get count
+./get-all-issues.sh --json | jq '[.[] | select(.labels[] | .name == "bug")] | length'
 
-# Filter by pattern
-./list-kanban-board.sh --json | jq '.[] | select(.title | contains("EPIC"))'
+# Get issues updated in the last day
+./get-all-issues.sh --json | jq '.[] | select(.updatedAt > now - 86400)'
 ```
 
-### 4. Automate Status Reports
+### 4. Automate Issue Updates
 ```bash
-# Daily status report via cron
-# Add to crontab: 0 9 * * * /path/to/project-status-dashboard.sh -o /reports/status_$(date +\%Y-\%m-\%d).txt
+# Add label to all open issues
+./get-all-issues.sh --state open --json | jq -r '.[].number' | while read num; do
+  ./update-issue-by-id.sh "$num" --add-label "needs-triage"
+done
 
-# Weekly board export
-# 0 18 * * FRI /path/to/list-kanban-board.sh --csv > /reports/board_$(date +\%Y-\%m-\%d).csv
+# Close all issues with "wontfix" label
+./get-all-issues.sh --labels "wontfix" --json | jq -r '.[].number' | while read num; do
+  ./remove-issue-by-id.sh "$num" --force --reason "Marked as wontfix"
+done
 ```
 
 ### 5. Color Output
 Scripts use colors by default. To disable:
 ```bash
 # Pipe through cat to strip colors
-./project-status-dashboard.sh | cat
+./get-all-issues.sh | cat
 
 # Or disable in output file
-./project-status-dashboard.sh -o status.txt
+./get-all-issues.sh -c > issues.csv
+```
+
+### 6. Dry-Run Mode
+Always use `--dry-run` before making bulk changes:
+```bash
+# Preview what would happen
+./update-issue-by-id.sh 26 --dry-run --state closed
+
+# After confirming, apply changes
+./update-issue-by-id.sh 26 --state closed
 ```
 
 ---
@@ -433,6 +494,17 @@ For issues or suggestions:
 
 ---
 
+## Quick Reference
+
+| Script | Purpose | Usage |
+|--------|---------|-------|
+| `get-issue-by-id.sh` | Get issue details | `./get-issue-by-id.sh <number> [format]` |
+| `get-all-issues.sh` | List/filter issues | `./get-all-issues.sh [options]` |
+| `update-issue-by-id.sh` | Modify issue | `./update-issue-by-id.sh <number> [options]` |
+| `remove-issue-by-id.sh` | Close issue | `./remove-issue-by-id.sh <number> [options]` |
+
+---
+
 **Last Updated:** November 25, 2025  
 **Repository:** isaaceliape/typee  
-**Project:** Typee Kanban board
+**Status:** GitHub Issues (migrated from Kanban board)
