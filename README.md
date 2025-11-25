@@ -1,5 +1,7 @@
 #  ⌨️ Typee
 
+[![Lint](https://github.com/isaaceliape/typee/actions/workflows/lint.yml/badge.svg?branch=master)](https://github.com/isaaceliape/typee/actions/workflows/lint.yml)
+
 A modern, high-performance touch typing practice tool built with Vue 3, TypeScript, and Vite.
 
 **Live Demo:** [isaaceliape.github.io/typee](https://isaaceliape.github.io/typee)
@@ -16,6 +18,7 @@ A modern, high-performance touch typing practice tool built with Vue 3, TypeScri
 - [Code Quality](#-code-quality)
 - [Contributing](#-contributing)
 - [Tools & Commands](#-tools--commands)
+- [CI/CD Pipeline](#-cicd-pipeline)
 - [Performance](#-performance)
 - [Troubleshooting](#-troubleshooting)
 
@@ -860,6 +863,109 @@ bun test -- --reporter=verbose
 | `close-issue-by-id.sh` | Close issue | `./close-issue-by-id.sh 26` |
 
 See `tools/README.md` for complete documentation.
+
+## 🔄 CI/CD Pipeline
+
+### Automated Linting with GitHub Actions
+
+This project uses GitHub Actions to automatically run ESLint checks on all pull requests and pushes to the master branch.
+
+**Workflow Overview:**
+- **Trigger**: Pull requests to `master` branch and pushes to `master`
+- **Runtime**: Ubuntu Latest
+- **Timeout**: 10 minutes
+- **Status Check**: `ESLint Code Quality Check`
+
+**Workflow Steps:**
+1. Checkout code with full history
+2. Setup BUN package manager (latest)
+3. Setup Node.js 20.x
+4. Cache BUN modules for faster builds
+5. Cache node_modules for faster builds
+6. Install dependencies with frozen lockfile
+7. Run ESLint linting check
+8. Report status and upload results
+
+**Performance:**
+- Average execution time: < 2 minutes
+- Caching strategy minimizes reinstalls
+- Deterministic builds with frozen lockfile
+
+### Branch Protection Rules
+
+The `master` branch is protected with the following rules:
+
+- ✅ **Require status checks to pass before merging**
+  - ESLint Code Quality Check must pass
+- ✅ **Require pull request reviews before merging**
+  - At least 1 approval required
+  - Stale reviews are dismissed
+- ✅ **Enforce for administrators**
+  - Rules apply to all users including maintainers
+- ✅ **Block force pushes and deletions**
+  - Prevents accidental branch removal
+
+### Pull Request Workflow
+
+1. Create a feature branch: `git checkout -b feature/my-feature`
+2. Make changes and commit: `git commit -m "feat: description"`
+3. Push to remote: `git push -u origin feature/my-feature`
+4. Create pull request on GitHub
+5. ESLint workflow automatically runs
+6. Fix any linting errors if needed
+7. Request code review
+8. After approval, merge to master (only if ESLint passes)
+
+### Workflow Status Badge
+
+The workflow status is displayed in the README header with a badge:
+- 🟢 **Green** - Latest commit passed linting
+- 🔴 **Red** - Latest commit failed linting
+- 🟡 **Yellow** - Workflow currently running
+
+Click the badge to view detailed workflow runs and logs.
+
+### Viewing Workflow Results
+
+**On GitHub:**
+1. Go to [Actions tab](https://github.com/isaaceliape/typee/actions)
+2. Select "Lint" workflow
+3. Click the run you want to inspect
+4. View step-by-step execution and logs
+
+**Locally:**
+Run linting before pushing to catch issues early:
+```bash
+bun run lint
+```
+
+### Troubleshooting CI/CD Issues
+
+**Workflow fails with "Module not found":**
+```bash
+# Clear cache and reinstall
+rm -rf node_modules bun.lock
+bun install
+bun run lint
+```
+
+**Linting check failing on PR:**
+1. Pull latest master: `git pull origin master`
+2. Run linting locally: `bun run lint`
+3. Fix issues: `bun run lint -- --fix`
+4. Commit and push: `git commit -am "fix: lint errors" && git push`
+
+**Can't merge PR due to failed checks:**
+1. Wait for workflow to complete (check Actions tab)
+2. Fix any linting errors locally
+3. Push fixes to PR branch
+4. Workflow re-runs automatically
+5. Once passing and approved, merge PR
+
+**Manual Workflow Trigger:**
+```bash
+gh workflow run lint.yml -r master
+```
 
 ## ⚡ Performance
 
