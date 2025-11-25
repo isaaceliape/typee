@@ -45,6 +45,34 @@ See `tools/README.md` for full documentation and examples.
 - **Lint**: `bun run lint` - Run ESLint checks
 - **Test**: `bun test` or `bun run test` - Run Vitest tests. Run single test: `bun test -- <test-file>`
 
+## CI/CD Pipeline
+
+### GitHub Actions Workflow
+This project uses GitHub Actions to automatically run linting checks:
+- **Workflow File**: `.github/workflows/lint.yml`
+- **Trigger**: Pull requests and pushes to master branch
+- **Status Check**: `ESLint Code Quality Check`
+- **Branch Protection**: Master branch requires passing linting before merge
+
+**Workflow Features:**
+- Automated ESLint checks on all PRs
+- Caching for BUN modules and node_modules
+- Frozen lockfile for deterministic builds
+- Full Node.js 20.x support
+- ~2 minute average execution time
+
+**Key Rules:**
+- All code must pass linting before merging to master
+- At least 1 code review approval required
+- Stale reviews are automatically dismissed
+- Force pushes and deletions are blocked on master
+
+**For Developers:**
+- Run `bun run lint` locally before committing
+- Fix linting errors with `bun run lint -- --fix`
+- Check GitHub Actions tab for workflow results
+- Cannot merge PR unless linting passes
+
 ## Build System
 This project uses **Vite** for fast development and production builds (migrated from Vue CLI).
 - TypeScript enabled with Vue 3 support

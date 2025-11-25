@@ -11,6 +11,7 @@ These tools provide command-line access to GitHub Issues management functionalit
 - **Get All Issues** - List all GitHub issues with filtering and formatting
 - **Update Issue by ID** - Modify issue properties (title, body, labels, state, assignees)
 - **Close Issue by ID** - Close issues
+- **Create PR from Issue** - Create pull requests automatically from GitHub issues
 
 ## Prerequisites
 
@@ -411,8 +412,6 @@ Update GitHub issue properties (title, body, labels, state, assignees).
 ✅ Issue #26 updated successfully
 ```
 
----
-
 ### 5. close-issue-by-id.sh
 
 Close a GitHub issue (marks as closed; can be reopened if needed).
@@ -462,6 +461,154 @@ Close issue #26? (y/N): y
 
 ✅ Issue #26 closed successfully
 ℹ️  To reopen: gh issue reopen 26 --repo isaaceliape/typee
+```
+
+---
+
+### 6. create-pr-from-issue.sh
+
+Create a new pull request directly from a GitHub issue. Automatically generates branch name, PR title, and description from issue details.
+
+**Usage:**
+```bash
+./create-pr-from-issue.sh [options]
+```
+
+**Arguments:**
+- `issue_number` (required): GitHub issue number
+
+**Options:**
+- `-h, --help`: Show help message
+- `-i, --issue <NUMBER>`: Issue number (required)
+- `-b, --branch <NAME>`: Custom branch name (optional, auto-generated if not provided)
+- `-t, --title <TITLE>`: Custom PR title (optional, uses issue title if not provided)
+- `-d, --description <DESC>`: Custom PR description (optional, uses issue body if not provided)
+- `--base <BRANCH>`: Base branch to merge into (default: `master`)
+- `--draft`: Create as draft PR (not ready for merge)
+- `--no-branch`: Use current branch instead of creating new one
+- `--auto-format`: Auto-format branch name from issue title (kebab-case)
+- `--link-issue`: Include "Closes #issue" in PR description to auto-link issue
+
+**Examples:**
+```bash
+# Create PR from issue #31
+./create-pr-from-issue.sh --issue 31
+
+# Create PR with custom branch name
+./create-pr-from-issue.sh -i 31 -b feature/my-feature
+
+# Create as draft PR
+./create-pr-from-issue.sh --issue 26 --draft
+
+# Create PR with auto-formatted branch name and link to issue
+./create-pr-from-issue.sh --issue 30 --auto-format --link-issue
+
+# Create PR merging to develop branch
+./create-pr-from-issue.sh -i 27 --base develop
+
+# Use current branch instead of creating new one
+./create-pr-from-issue.sh --issue 28 --no-branch
+
+# Create PR with custom title and link issue
+./create-pr-from-issue.sh --issue 29 -t "My custom title" --link-issue
+```
+
+**How It Works:**
+
+1. Fetches issue details from GitHub
+2. Generates branch name (format: `type/issue-NUMBER-description` or custom)
+3. Creates new branch from base branch (or uses current branch with `--no-branch`)
+4. Generates PR title and description (from issue title/body)
+5. Pushes branch to remote
+6. Creates pull request on GitHub
+
+**Branch Naming:**
+
+- Default: `feature/issue-31-issue-title-here`
+- With `--auto-format`: `feature/issue-title-here`
+- Custom with `-b`: Uses exact name provided
+- Extracts priority type from issue (CRITICAL→critical, HIGH→high, etc.)
+
+**PR Description Template:**
+
+Automatically generated from issue details:
+```
+## Issue Description
+[Issue body content]
+
+---
+
+## Implementation
+
+Please describe your implementation approach.
+
+## Changes Made
+
+- Change 1
+- Change 2
+- Change 3
+
+## Testing
+
+Please provide testing steps to verify this implementation.
+
+## Checklist
+
+- [ ] Tests pass locally
+- [ ] Code follows project guidelines
+- [ ] Documentation updated if needed
+- [ ] Related issue #31 addressed
+
+---
+
+Closes #31
+```
+
+**Sample Output:**
+```
+════════════════════════════════════════════════════════════
+Create Pull Request from Issue
+════════════════════════════════════════════════════════════
+
+ℹ️  Fetching issue #31 details...
+
+Issue Information:
+  Title: 🟡 HIGH: Configure GitHub Actions to run linting before merge
+  State: OPEN
+  Labels: ci/cd,github-actions
+
+ℹ️  Generated branch name: feature/issue-31-configure-github-actions
+
+Pull Request Information:
+  Title: 🟡 HIGH: Configure GitHub Actions to run linting before merge
+  Branch: feature/issue-31-configure-github-actions
+  Base Branch: master
+  Draft: No
+  Link Issue: false
+
+ℹ️  Creating new branch: feature/issue-31-configure-github-actions
+✅ Switched to branch: feature/issue-31-configure-github-actions
+
+ℹ️  Pushing branch to remote...
+✅ Branch pushed to remote
+
+ℹ️  Creating pull request...
+✅ Pull request created!
+
+════════════════════════════════════════════════════════════
+Pull Request Created Successfully!
+════════════════════════════════════════════════════════════
+URL: https://github.com/isaaceliape/typee/pull/32
+Next Steps:
+  1. Review the PR on GitHub
+  2. Request code review
+  3. Address any feedback
+  4. Merge when approved and checks pass
+PR Information:
+  Branch: feature/issue-31-configure-github-actions → master
+  Draft: false
+  Related Issue: #31
+════════════════════════════════════════════════════════════
 ```
 
 ---
@@ -537,6 +684,30 @@ done
 ./get-all-issues.sh --assignee isaaceliape --json | jq '.'
 ```
 
+### Workflow 6: Create Pull Request from Issue
+```bash
+# Create PR from issue #31
+./create-pr-from-issue.sh --issue 31
+
+# Create draft PR from issue with auto-formatted branch
+./create-pr-from-issue.sh --issue 26 --draft --auto-format
+
+# Create PR and auto-link the issue in description
+./create-pr-from-issue.sh -i 30 --link-issue
+
+# Create multiple PRs from issues
+for issue in 25 26 27; do
+  ./create-pr-from-issue.sh --issue "$issue" --link-issue
+done
+
+# Create PR with custom base branch
+./create-pr-from-issue.sh --issue 28 --base develop --auto-format
+
+# Create PR from current branch (don't create new branch)
+git checkout -b my-branch
+./create-pr-from-issue.sh --issue 29 --no-branch --title "Custom PR title"
+```
+
 ---
 
 ## Tips & Best Practices
@@ -556,6 +727,7 @@ ln -s $(pwd)/get-issue-by-id.sh /usr/local/bin/get-issue
 ln -s $(pwd)/get-all-issues.sh /usr/local/bin/get-issues
 ln -s $(pwd)/update-issue-by-id.sh /usr/local/bin/update-issue
 ln -s $(pwd)/close-issue-by-id.sh /usr/local/bin/close-issue
+ln -s $(pwd)/create-pr-from-issue.sh /usr/local/bin/create-pr
 ```
 
 ### 3. Use jq for Complex Queries
@@ -713,6 +885,7 @@ For issues or suggestions:
 | `get-all-issues.sh` | List/filter issues | `./get-all-issues.sh [options]` |
 | `update-issue-by-id.sh` | Modify issue | `./update-issue-by-id.sh <number> [options]` |
 | `close-issue-by-id.sh` | Close issue | `./close-issue-by-id.sh <number> [options]` |
+| `create-pr-from-issue.sh` | Create PR from issue | `./create-pr-from-issue.sh --issue <NUMBER> [options]` |
 
 ---
 
