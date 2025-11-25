@@ -19,6 +19,24 @@
 #   -a, --assignee <USER>     Assign to user
 #   --template <TYPE>         Use template: scrum, feature, bug, refactor (optional)
 #   --story-points <POINTS>   Scrum story points (for scrum template)
+#   
+# Template Field Options (fills template with provided data):
+#   --description <TEXT>      Description/motivation (feature, bug templates)
+#   --behavior <TEXT>         Expected behavior (feature, bug templates)
+#   --criteria <TEXT>         Acceptance criteria (comma-separated)
+#   --steps <TEXT>            Reproduction steps (comma-separated for bug)
+#   --actual <TEXT>           Actual behavior (bug template)
+#   --environment <TEXT>      Environment info (bug template)
+#   --context <TEXT>          Additional context (bug template)
+#   --person <ROLE>           User story persona (scrum template)
+#   --action <ACTION>         Desired action (scrum template)
+#   --benefit <BENEFIT>       Expected benefit (scrum template)
+#   --current-state <TEXT>    Current implementation (refactor template)
+#   --proposed <TEXT>         Proposed changes (refactor template)
+#   --benefits <TEXT>         Benefits (comma-separated for refactor)
+#   --plan <TEXT>             Implementation plan (comma-separated for refactor)
+#   --strategy <TEXT>         Testing strategy (refactor template)
+#   
 #   --no-prefix               Create without priority prefix
 
 # Examples:
@@ -26,6 +44,24 @@
 #   ./create-issue.sh -t "Fix bug Y" -p CRITICAL -l "bug,typescript" -b "Description here"
 #   ./create-issue.sh --title "User login feature" --priority HIGH --template scrum --story-points 5
 #   ./create-issue.sh --title "Refactor module Z" --priority MEDIUM --labels "refactoring"
+#
+#   # Scrum template with filled data
+#   ./create-issue.sh -t "Add typing timer" --template scrum --story-points 8 \
+#     --person "user" --action "see typing speed and time" --benefit "track progress"
+#
+#   # Bug template with filled data
+#   ./create-issue.sh -t "Login button broken" --template bug --priority CRITICAL \
+#     --description "Button not responding to clicks" \
+#     --steps "1. Go to login page,2. Click login button,3. Nothing happens" \
+#     --actual "Page does not navigate anywhere" \
+#     --behavior "Should navigate to dashboard" \
+#     --environment "Chrome 120, Ubuntu 22.04"
+#
+#   # Feature template with filled data
+#   ./create-issue.sh -t "Dark mode support" --template feature --priority HIGH \
+#     --description "Add dark theme to application" \
+#     --behavior "Theme should toggle and persist" \
+#     --criteria "Toggle in settings,Theme persists on reload,All components support dark mode"
 #
 # Requirements:
 #   - GitHub CLI (gh): https://cli.github.com
@@ -52,6 +88,23 @@ NO_PREFIX=false
 TEMPLATE=""
 STORY_POINTS=""
 
+# Template field variables
+DESCRIPTION=""
+BEHAVIOR=""
+CRITERIA=""
+STEPS=""
+ACTUAL_BEHAVIOR=""
+ENVIRONMENT=""
+CONTEXT=""
+PERSON=""
+ACTION=""
+BENEFIT=""
+CURRENT_STATE=""
+PROPOSED_CHANGES=""
+BENEFITS=""
+PLAN=""
+STRATEGY=""
+
 # Helper function to get priority emoji
 get_priority_emoji() {
     case $1 in
@@ -69,12 +122,20 @@ get_priority_emoji() {
 generate_scrum_template() {
     local title="$1"
     local story_points="$2"
+    local person="${3:-role/persona}"
+    local action="${4:-action/feature}"
+    local benefit="${5:-benefit/value}"
     
-    local template="## User Story
+    cat <<EOF
+## Story Points
 
-As a **role/persona**,  
-I want to **action/feature**,  
-So that I can **benefit/value**.
+**${story_points:-N/A}**
+
+## User Story
+
+As a **$person**,  
+I want to **$action**,  
+So that I can **$benefit**.
 
 ## Description
 
@@ -99,105 +160,163 @@ Provide a brief description of the feature or capability being requested.
 - [ ] Tests passing
 - [ ] Code reviewed
 - [ ] Merged to main branch
-- [ ] Documentation updated"
-
-    if [ -n "$story_points" ]; then
-        template="## Story Points
-
-**$story_points**
-
-$template"
-    fi
-    
-    echo "$template"
+- [ ] Documentation updated
+EOF
 }
 
 # Helper function to generate Feature template
 generate_feature_template() {
-    local template="## Feature Request
+    local description="${1:-Brief description of the feature.}"
+    local behavior="${2:-What should happen when this feature is implemented?}"
+    local criteria="${3:-}"
+    
+    cat <<EOF
+## Feature Request
 
 ### Description
-Brief description of the feature.
+$description
 
 ### Motivation
 Why is this feature needed?
 
 ### Expected Behavior
-What should happen when this feature is implemented?
+$behavior
 
 ### Acceptance Criteria
+EOF
 
+    if [ -n "$criteria" ]; then
+        # Convert comma-separated criteria to checklist
+        echo "$criteria" | tr ',' '\n' | while IFS= read -r line; do
+            echo "- [ ] $(echo "$line" | sed 's/^[ \t]*-* *\[ *\] *//')"
+        done
+    else
+        cat <<EOF
 - [ ] Criterion 1
 - [ ] Criterion 2
 - [ ] Criterion 3
+EOF
+    fi
+
+    cat <<EOF
 
 ### Implementation Details
 
 - Implementation approach
 - Dependencies
-- Affected components"
-
-    echo "$template"
+- Affected components
+EOF
 }
 
 # Helper function to generate Bug template
 generate_bug_template() {
-    local template="## Bug Report
+    local description="${1:-Clear description of the bug.}"
+    local steps="${2:-}"
+    local expected="${3:-What should happen?}"
+    local actual="${4:-What actually happens?}"
+    local environment="${5:-}"
+    local context="${6:-}"
+
+    cat <<EOF
+## Bug Report
 
 ### Description
-Clear description of the bug.
+$description
 
 ### Steps to Reproduce
+EOF
 
+    if [ -n "$steps" ]; then
+        # Convert comma-separated steps to numbered list
+        echo "$steps" | tr ',' '\n' | nl -v 1 -s '. '
+    else
+        cat <<EOF
 1. Step 1
 2. Step 2
 3. Step 3
+EOF
+    fi
+
+    cat <<EOF
 
 ### Expected Behavior
-What should happen?
+$expected
 
 ### Actual Behavior
-What actually happens?
+$actual
 
 ### Environment
+EOF
 
+    if [ -n "$environment" ]; then
+        echo "$environment"
+    else
+        cat <<EOF
 - OS: 
 - Browser/Runtime: 
 - Version: 
+EOF
+    fi
+
+    cat <<EOF
 
 ### Additional Context
-
-Any additional information, screenshots, or logs."
-
-    echo "$template"
+$context
+EOF
 }
 
 # Helper function to generate Refactor template
 generate_refactor_template() {
-    local template="## Refactoring
+    local current="${1:-Current implementation details.}"
+    local proposed="${2:-What needs to be refactored and why?}"
+    local benefits="${3:-}"
+    local plan="${4:-}"
+    local strategy="${5:-}"
+
+    cat <<EOF
+## Refactoring
 
 ### Current State
-Current implementation details.
+$current
 
 ### Proposed Changes
-What needs to be refactored and why?
+$proposed
 
 ### Benefits
+EOF
 
+    if [ -n "$benefits" ]; then
+        echo "$benefits" | tr ',' '\n' | while IFS= read -r line; do
+            echo "- $(echo "$line" | sed 's/^[ \t]*//')"
+        done
+    else
+        cat <<EOF
 - Benefit 1
 - Benefit 2
 - Benefit 3
+EOF
+    fi
+
+    cat <<EOF
 
 ### Implementation Plan
+EOF
 
+    if [ -n "$plan" ]; then
+        echo "$plan" | tr ',' '\n' | nl -v 1 -s '. '
+    else
+        cat <<EOF
 1. Step 1
 2. Step 2
 3. Step 3
+EOF
+    fi
+
+    cat <<EOF
 
 ### Testing Strategy
-How will we verify the refactor doesn't introduce regressions?"
-
-    echo "$template"
+${strategy:-How will we verify the refactor doesn't introduce regressions?}
+EOF
 }
 
 # Helper functions
@@ -215,7 +334,7 @@ success() {
 }
 
 show_help() {
-    sed -n '/^##############################################################################/,/^##############################################################################/p' "$0" | tail -n +2 | head -n -1
+    sed -n '/^##############################################################################/,/^##############################################################################/p' "$0" | sed '1d;$d'
     exit 0
 }
 
@@ -267,6 +386,66 @@ while [[ $# -gt 0 ]]; do
             NO_PREFIX=true
             shift
             ;;
+        --description)
+            DESCRIPTION="$2"
+            shift 2
+            ;;
+        --behavior)
+            BEHAVIOR="$2"
+            shift 2
+            ;;
+        --criteria)
+            CRITERIA="$2"
+            shift 2
+            ;;
+        --steps)
+            STEPS="$2"
+            shift 2
+            ;;
+        --actual)
+            ACTUAL_BEHAVIOR="$2"
+            shift 2
+            ;;
+        --environment)
+            ENVIRONMENT="$2"
+            shift 2
+            ;;
+        --context)
+            CONTEXT="$2"
+            shift 2
+            ;;
+        --person)
+            PERSON="$2"
+            shift 2
+            ;;
+        --action)
+            ACTION="$2"
+            shift 2
+            ;;
+        --benefit)
+            BENEFIT="$2"
+            shift 2
+            ;;
+        --current-state)
+            CURRENT_STATE="$2"
+            shift 2
+            ;;
+        --proposed)
+            PROPOSED_CHANGES="$2"
+            shift 2
+            ;;
+        --benefits)
+            BENEFITS="$2"
+            shift 2
+            ;;
+        --plan)
+            PLAN="$2"
+            shift 2
+            ;;
+        --strategy)
+            STRATEGY="$2"
+            shift 2
+            ;;
         *)
             error "Unknown option: $1"
             ;;
@@ -302,16 +481,16 @@ fi
 if [ -n "$TEMPLATE" ] && [ -z "$BODY" ]; then
     case $TEMPLATE in
         scrum)
-            BODY=$(generate_scrum_template "$TITLE" "$STORY_POINTS")
+            BODY=$(generate_scrum_template "$TITLE" "$STORY_POINTS" "$PERSON" "$ACTION" "$BENEFIT")
             ;;
         feature)
-            BODY=$(generate_feature_template)
+            BODY=$(generate_feature_template "$DESCRIPTION" "" "$BEHAVIOR" "$CRITERIA")
             ;;
         bug)
-            BODY=$(generate_bug_template)
+            BODY=$(generate_bug_template "$DESCRIPTION" "$STEPS" "$BEHAVIOR" "$ACTUAL_BEHAVIOR" "$ENVIRONMENT" "$CONTEXT")
             ;;
         refactor)
-            BODY=$(generate_refactor_template)
+            BODY=$(generate_refactor_template "$CURRENT_STATE" "$PROPOSED_CHANGES" "$BENEFITS" "$PLAN" "$STRATEGY")
             ;;
     esac
 fi
