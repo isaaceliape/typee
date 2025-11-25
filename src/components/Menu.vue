@@ -56,15 +56,16 @@
            <td>{{ store.wordsPerSentence }}</td>
          </tr>
          <tr>
-           <td>Dark mode</td>
-           <td>
-             <ToggleButton
-               :active="store.darkMode"
-               @on-click-toggle-button="store.toggleDarkMode"
-             />
-           </td>
-         </tr>
-    </div>
+            <td>Dark mode</td>
+            <td>
+              <ToggleButton
+                :active="store.darkMode"
+                @on-click-toggle-button="store.toggleDarkMode"
+              />
+            </td>
+          </tr>
+       </table>
+     </div>
   </div>
 </template>
 
