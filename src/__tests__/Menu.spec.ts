@@ -63,7 +63,7 @@ describe('Menu.vue', () => {
     })
     const table = wrapper.find('table')
     expect(table.exists()).toBe(true)
-    expect(wrapper.findAll('tr')).toHaveLength(4)
+    expect(wrapper.findAll('tr')).toHaveLength(5)
   })
 
   it('renders menu content', () => {

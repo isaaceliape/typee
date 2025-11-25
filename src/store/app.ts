@@ -1,16 +1,9 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import type { Font } from './types'
 
-/**
- * Font option for the typing interface.
- * Represents a selectable font with display name and CSS value.
- */
-export interface Font {
-  /** Display name shown in the UI */
-  text: string
-  /** CSS font-family value */
-  value: string
-}
+// Re-export types for backward compatibility
+export type { Font }
 
 /**
  * Main application store for the typing game.
