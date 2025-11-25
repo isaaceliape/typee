@@ -64,18 +64,3 @@ jobs:
           name: lint-results
           path: lint-results.json
           retention-days: 30
-
-  lint-success:
-    name: Lint Check Status
-    runs-on: ubuntu-latest
-    needs: lint
-    if: always()
-    steps:
-      - name: Check lint status
-        run: |
-          if [ "${{ needs.lint.result }}" == "failure" ]; then
-            echo "❌ Linting failed. Please fix the issues before merging."
-            exit 1
-          else
-            echo "✅ Linting passed successfully!"
-          fi
