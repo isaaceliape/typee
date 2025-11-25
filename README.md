@@ -57,7 +57,7 @@ A modern, high-performance touch typing practice tool built with Vue 3, TypeScri
 - **SCSS** - Advanced CSS preprocessing for styling
 
 ### State Management
-- **Pinia** - Lightweight state management (migrated from Vuex)
+- **Pinia** - Lightweight state management (Vue 3 official state management library)
 
 ### Development Tools
 - **BUN** - Fast JavaScript runtime and package manager (10x faster than NPM)
@@ -385,55 +385,103 @@ App.vue (Root)
 
 ### State Management (Pinia Store)
 
-The store maintains application state with the following key properties:
+The application uses Pinia for predictable state management. All state modifications go through store actions, ensuring consistency and testability.
+
+**Store Architecture:**
 
 ```typescript
-// src/store/app.ts - Global state
-interface AppState {
-  currentPos: number              // Current character position in sentence
-  errorCount: number              // Total errors in session
-  sentencePos: number             // Current sentence index
-  selectedFont: string            // Selected font family
-  fontSize: number                // Font size in pixels
-  wordsPerSentence: number        // Words per sentence (difficulty)
-  showCapitalLetters: boolean     // Capitalization mode
-  disableTyping: boolean          // Typing enabled/disabled
-  menuOpen: boolean               // Menu visibility
-  darkMode: boolean               // Theme preference
-  sentences: string[]             // Array of text sentences
-  currentSentence: string         // Current sentence being typed
-}
+// src/store/app.ts - Pinia store using Composition API
+export const useAppStore = defineStore('app', () => {
+  // State (use ref for reactive values)
+  const errorCount = ref(0)
+  const selectedFont = ref('Ubuntu')
+
+  // Getters (use computed for derived state)
+  const getSentencesCount = computed(() => sentences.value.length)
+
+  // Actions (regular functions that modify state)
+  const setErrorCount = (payload: number) => {
+    errorCount.value = payload
+  }
+
+  const increaseErrorCount = () => {
+    errorCount.value += 1
+  }
+
+  return {
+    errorCount,
+    selectedFont,
+    getSentencesCount,
+    setErrorCount,
+    increaseErrorCount,
+  }
+})
 ```
 
-### State Actions
-
-Key store actions for state management:
+**Store Usage in Components:**
 
 ```typescript
-// Character input handling
-updateCharacter(char: string)     // Process typed character
+import { useAppStore } from '@/store/app'
 
-// Statistics
-incrementError()                  // Increment error count
-resetErrors()                     // Clear error count
-incrementPosition()               // Move to next character
+export default defineComponent({
+  setup() {
+    const store = useAppStore()
+    
+    // Access state (automatically reactive)
+    const errorCount = store.errorCount
+    
+    // Access getters
+    const sentenceCount = store.getSentencesCount
+    
+    // Call actions
+    const handleIncreaseError = () => {
+      store.increaseErrorCount()
+    }
 
-// Navigation
-advanceSentence()                // Move to next sentence
-goToPreviousSentence()           // Move to previous sentence
-resetToStart()                   // Reset entire typing session
-
-// Settings
-updateFont(font: string)         // Change font
-updateFontSize(size: number)     // Adjust font size
-updateWordsPerSentence(words)    // Change difficulty
-toggleCapitalLetters()           // Toggle uppercase mode
-toggleDarkMode()                 // Toggle theme
-
-// UI Control
-toggleMenu()                     // Show/hide menu
-toggleTyping()                   // Pause/resume typing
+    return { errorCount, sentenceCount, handleIncreaseError }
+  }
+})
 ```
+
+**Key Store Files:**
+
+- **`src/store/app.ts`** - Main application store with Composition API pattern
+- **`src/store/types.ts`** - TypeScript type definitions for store state
+- **`src/store/utilities.ts`** - Factory functions and helpers for consistent store patterns
+
+**Store Naming Conventions:**
+
+| Element | Convention | Examples |
+|---------|-----------|----------|
+| **State** | camelCase | `errorCount`, `selectedFont`, `menuOpen` |
+| **Getters** | camelCase with `get` prefix | `getSentencesCount`, `getErrorRate` |
+| **Actions** | camelCase with verb prefix | `setErrorCount`, `toggleMenuOpen`, `increaseErrorCount` |
+| **Types** | PascalCase | `Font`, `GameState`, `AppState` |
+
+**Example state update flow:**
+
+```
+User Input
+    ↓
+TextRenderer captures keystroke
+    ↓
+Validates against expected character
+    ↓
+Updates Pinia store (store.increaseErrorCount())
+    ↓
+Store notifies all subscribed components
+    ↓
+Letter components re-render with new styles
+    ↓
+InfoPanel updates statistics
+    ↓
+Visual feedback displayed to user
+```
+
+**For detailed store documentation, see:**
+- **`docs/pinia-store-architecture.md`** - Complete store architecture guide
+- **`docs/naming-conventions.md`** - Naming conventions for stores
+- **`docs/store-examples-migration.md`** - Store examples and migration guide
 
 ### Data Flow Diagram
 
@@ -1236,6 +1284,9 @@ if (errorCount > 10) debugger
 
 See the `docs/` directory for detailed guidelines on development practices:
 
+- **`pinia-store-architecture.md`** - Pinia store architecture, best practices, and patterns
+- **`naming-conventions.md`** - Naming conventions for store state, getters, actions, and types
+- **`store-examples-migration.md`** - Store examples and migration guide from Vuex to Pinia
 - **`typescript-guidelines.md`** - TypeScript best practices and type patterns
 - **`vue-patterns.md`** - Vue 3 and Composition API patterns and conventions
 - **`api-standards.md`** - REST API design standards and error handling
