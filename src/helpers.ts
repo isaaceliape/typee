@@ -1,30 +1,30 @@
 import { pascalCase } from "pascal-case"
 import { computed, type ComputedRef } from 'vue'
-import type { Store } from 'vuex'
 
-const mutationFactory = (properties: string[]) => properties
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mutationFactory = (properties: string[]): Record<string, (state: Record<string, unknown>, payload: unknown) => void> => properties
     .map((property: string) => ({
-      [`set${pascalCase(property)}`](state: any, payload: any) {
+      [`set${pascalCase(property)}`](state: Record<string, unknown>, payload: unknown) {
         state[property] = payload
       }
     }))
-    .reduce((x, y) => ({ ...x, ...y }))
+    .reduce((x, y) => ({ ...x, ...y }), {})
 
-export const mapAppState = (items: string[], store: Store<any>) => {
-  return items.reduce((accumulator: Record<string, ComputedRef<any>>, currentValue: string) => ({ ...accumulator, ...{
+export const mapAppState = (items: string[], store: { state: Record<string, unknown> }): Record<string, ComputedRef<unknown>> => {
+  return items.reduce((accumulator: Record<string, ComputedRef<unknown>>, currentValue: string) => ({ ...accumulator, ...{
     [currentValue]: computed(() => store.state[currentValue])
   }}), {})
 }
 
-export const mapAppGetters = (items: string[], store: Store<any>) => {
-  return items.reduce((accumulator: Record<string, ComputedRef<any>>, currentValue: string) => ({ ...accumulator, ...{
+export const mapAppGetters = (items: string[], store: { getters: Record<string, unknown> }): Record<string, ComputedRef<unknown>> => {
+  return items.reduce((accumulator: Record<string, ComputedRef<unknown>>, currentValue: string) => ({ ...accumulator, ...{
     [currentValue]: computed(() => store.getters[currentValue])
   }}), {})
 }
 
-export const mapAppMutations = (items: string[], store: Store<any>) => {
-  return items.reduce((accumulator: Record<string, (_payload?: any) => void>, currentValue: string) => ({ ...accumulator, ...{
-    [currentValue]: (_payload?: any) => store.commit(currentValue, _payload)
+export const mapAppMutations = (items: string[], store: { commit: (mutation: string, payload?: unknown) => void }): Record<string, (payload?: unknown) => void> => {
+  return items.reduce((accumulator: Record<string, (payload?: unknown) => void>, currentValue: string) => ({ ...accumulator, ...{
+    [currentValue]: (payload?: unknown) => store.commit(currentValue, payload)
   }}), {})
 }
 

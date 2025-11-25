@@ -5,8 +5,14 @@ import VueHead from 'vue-head'
 import App from './App.vue'
 import AppStore from './store/AppStore'
 
+declare global {
+  interface Window {
+    store: typeof AppStore
+  }
+}
+
 const app: VueApp = createApp(App)
-;(window as any).store = AppStore
+window.store = AppStore
 app.use(AppStore)
 app.use(VueHead)
 app.mount('#app')
