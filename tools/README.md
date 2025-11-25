@@ -9,7 +9,7 @@ These tools provide command-line access to GitHub Issues management functionalit
 - **Get Issue by ID** - Retrieve specific issue information
 - **Get All Issues** - List all GitHub issues with filtering and formatting
 - **Update Issue by ID** - Modify issue properties (title, body, labels, state, assignees)
-- **Remove Issue by ID** - Close issues
+- **Close Issue by ID** - Close issues
 
 ## Prerequisites
 
@@ -203,13 +203,13 @@ Update GitHub issue properties (title, body, labels, state, assignees).
 
 ---
 
-### 4. remove-issue-by-id.sh
+### 4. close-issue-by-id.sh
 
 Close a GitHub issue (marks as closed; can be reopened if needed).
 
 **Usage:**
 ```bash
-./remove-issue-by-id.sh <issue_number> [options]
+./close-issue-by-id.sh <issue_number> [options]
 ```
 
 **Arguments:**
@@ -224,16 +224,16 @@ Close a GitHub issue (marks as closed; can be reopened if needed).
 **Examples:**
 ```bash
 # Close an issue (with confirmation)
-./remove-issue-by-id.sh 26
+./close-issue-by-id.sh 26
 
 # Close with a reason
-./remove-issue-by-id.sh 26 --reason "Completed"
+./close-issue-by-id.sh 26 --reason "Completed"
 
 # Preview what would happen
-./remove-issue-by-id.sh 26 --dry-run
+./close-issue-by-id.sh 26 --dry-run
 
 # Close without confirmation
-./remove-issue-by-id.sh 26 --force --reason "Duplicate"
+./close-issue-by-id.sh 26 --force --reason "Duplicate"
 ```
 
 **Sample Output:**
@@ -303,14 +303,14 @@ Close issue #26? (y/N): y
 ### Workflow 4: Manage Issues
 ```bash
 # Close an issue with confirmation
-./remove-issue-by-id.sh 26
+./close-issue-by-id.sh 26
 
 # Close multiple issues without confirmation
-./remove-issue-by-id.sh 1 --force --reason "Duplicate"
-./remove-issue-by-id.sh 2 --force --reason "Invalid"
+./close-issue-by-id.sh 1 --force --reason "Duplicate"
+./close-issue-by-id.sh 2 --force --reason "Invalid"
 
 # Close issue with reason comment
-./remove-issue-by-id.sh 26 --force --reason "Completed - merged in PR #123"
+./close-issue-by-id.sh 26 --force --reason "Completed - merged in PR #123"
 ```
 
 ### Workflow 5: Bulk Operations with JSON Output
@@ -345,7 +345,7 @@ export PATH="$PATH:$(pwd)"
 ln -s $(pwd)/get-issue-by-id.sh /usr/local/bin/get-issue
 ln -s $(pwd)/get-all-issues.sh /usr/local/bin/get-issues
 ln -s $(pwd)/update-issue-by-id.sh /usr/local/bin/update-issue
-ln -s $(pwd)/remove-issue-by-id.sh /usr/local/bin/close-issue
+ln -s $(pwd)/close-issue-by-id.sh /usr/local/bin/close-issue
 ```
 
 ### 3. Use jq for Complex Queries
@@ -369,7 +369,7 @@ done
 
 # Close all issues with "wontfix" label
 ./get-all-issues.sh --labels "wontfix" --json | jq -r '.[].number' | while read num; do
-  ./remove-issue-by-id.sh "$num" --force --reason "Marked as wontfix"
+  ./close-issue-by-id.sh "$num" --force --reason "Marked as wontfix"
 done
 ```
 
@@ -443,10 +443,10 @@ chmod +x *.sh
 **Solution:** Run from tools directory or add to PATH
 ```bash
 # From repo root
-./tools/get-kanban-user-story.sh 27
+./tools/get-issue-by-id.sh 26
 
 # Or from tools directory
-cd tools && ./get-kanban-user-story.sh 27
+cd tools && ./get-issue-by-id.sh 26
 
 # Or add to PATH
 export PATH="$PATH:$(pwd)/tools"
@@ -501,7 +501,7 @@ For issues or suggestions:
 | `get-issue-by-id.sh` | Get issue details | `./get-issue-by-id.sh <number> [format]` |
 | `get-all-issues.sh` | List/filter issues | `./get-all-issues.sh [options]` |
 | `update-issue-by-id.sh` | Modify issue | `./update-issue-by-id.sh <number> [options]` |
-| `remove-issue-by-id.sh` | Close issue | `./remove-issue-by-id.sh <number> [options]` |
+| `close-issue-by-id.sh` | Close issue | `./close-issue-by-id.sh <number> [options]` |
 
 ---
 

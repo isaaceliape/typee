@@ -33,7 +33,7 @@ To manage issues, use the tools in `tools/` directory:
 - `./tools/get-issue-by-id.sh <number>` - View specific issue details
 - `./tools/get-all-issues.sh [options]` - List and filter issues
 - `./tools/update-issue-by-id.sh <number> [options]` - Modify issue properties
-- `./tools/remove-issue-by-id.sh <number> [options]` - Close issues
+- `./tools/close-issue-by-id.sh <number> [options]` - Close issues
 
 See `tools/README.md` for full documentation and examples.
 

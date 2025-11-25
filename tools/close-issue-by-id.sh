@@ -1,14 +1,14 @@
 #!/bin/bash
 
 ##############################################################################
-# Remove Issue by ID
+# Close Issue by ID
 #
 # Closes a GitHub issue by marking it as closed.
 # Note: GitHub doesn't support permanent deletion via CLI for security reasons.
 # This script closes issues; they can be reopened if needed.
 #
 # Usage:
-#   ./remove-issue-by-id.sh <issue_number> [options]
+#   ./close-issue-by-id.sh <issue_number> [options]
 #
 # Arguments:
 #   issue_number (required): GitHub issue number
@@ -20,10 +20,10 @@
 #   -f, --force             Skip confirmation prompt
 #
 # Examples:
-#   ./remove-issue-by-id.sh 26
-#   ./remove-issue-by-id.sh 26 --reason "Completed"
-#   ./remove-issue-by-id.sh 26 --dry-run
-#   ./remove-issue-by-id.sh 26 --force --reason "Duplicate"
+#   ./close-issue-by-id.sh 26
+#   ./close-issue-by-id.sh 26 --reason "Completed"
+#   ./close-issue-by-id.sh 26 --dry-run
+#   ./close-issue-by-id.sh 26 --force --reason "Duplicate"
 #
 # Requirements:
 #   - GitHub CLI (gh): https://cli.github.com
@@ -80,7 +80,7 @@ fi
 
 # Validate arguments
 if [ $# -lt 1 ]; then
-    error "Issue number is required\nUsage: ./remove-issue-by-id.sh <issue_number> [options]"
+    error "Issue number is required\nUsage: ./close-issue-by-id.sh <issue_number> [options]"
 fi
 
 ISSUE_NUMBER=$1
