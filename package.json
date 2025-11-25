@@ -2,9 +2,10 @@
   "name": "typing-tool",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "bun@latest",
   "scripts": {
     "dev": "vite",
-    "build": "npm test && vite build",
+    "build": "bun run test && vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext .vue,.js,.ts,.jsx,.tsx",
     "test": "vitest",

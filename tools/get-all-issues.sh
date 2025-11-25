@@ -132,45 +132,36 @@ case $STATE in
         ;;
 esac
 
-# Build gh command with filters
-GH_ARGS="--repo isaaceliape/typee --limit $LIMIT --json number,title,state,url,createdAt,updatedAt,assignees,labels,milestone"
-
-# Add state filter
-if [ "$STATE" != "all" ]; then
-    GH_ARGS="$GH_ARGS --search 'state:$STATE'"
-fi
+# Build search query for labels and assignee
+SEARCH_QUERY=""
 
 # Add labels filter
 if [ -n "$LABELS" ]; then
     IFS=',' read -ra LABEL_ARRAY <<< "$LABELS"
-    LABEL_QUERY=""
     for label in "${LABEL_ARRAY[@]}"; do
-        LABEL_QUERY="$LABEL_QUERY label:\"$(echo $label | xargs)\""
+        SEARCH_QUERY="$SEARCH_QUERY label:\"$(echo $label | xargs)\""
     done
-    GH_ARGS="$GH_ARGS --search '$LABEL_QUERY'"
 fi
 
 # Add assignee filter
 if [ -n "$ASSIGNEE" ]; then
-    GH_ARGS="$GH_ARGS --search 'assignee:$ASSIGNEE'"
+    SEARCH_QUERY="$SEARCH_QUERY assignee:$ASSIGNEE"
 fi
-
-# Add sort option
-case $SORT in
-    created)
-        GH_ARGS="$GH_ARGS --order asc"
-        ;;
-    updated)
-        GH_ARGS="$GH_ARGS --order desc"
-        ;;
-    comments)
-        GH_ARGS="$GH_ARGS --order desc"
-        ;;
-esac
 
 # Fetch issues
 info "Fetching issues (state: $STATE, limit: $LIMIT)..."
-ISSUES_DATA=$(eval "gh issue list $GH_ARGS" 2>/dev/null || error "Failed to fetch issues")
+
+# Build the command directly
+if [ -n "$SEARCH_QUERY" ]; then
+    ISSUES_DATA=$(gh issue list --state "$STATE" --limit "$LIMIT" --json number,title,state,url,createdAt,updatedAt,assignees,labels,milestone --search "$SEARCH_QUERY" 2>&1)
+else
+    ISSUES_DATA=$(gh issue list --state "$STATE" --limit "$LIMIT" --json number,title,state,url,createdAt,updatedAt,assignees,labels,milestone 2>&1)
+fi
+
+# Check if we got an error
+if echo "$ISSUES_DATA" | grep -q "unknown flag\|error"; then
+    error "Failed to fetch issues: $ISSUES_DATA"
+fi
 
 # Output based on format
 case $FORMAT in

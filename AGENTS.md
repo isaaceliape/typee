@@ -39,11 +39,11 @@ To manage issues, use the tools in `tools/` directory:
 See `tools/README.md` for full documentation and examples.
 
 ## Commands
-- **Dev**: `npm run dev` - Start Vite development server (http://localhost:5173/)
-- **Build**: `npm run build` - Build for production using Vite
-- **Preview**: `npm run preview` - Preview production build locally (http://localhost:4173/)
-- **Lint**: `npm run lint` - Run ESLint checks
-- **Test**: `npm test` - Run Vitest tests. Run single test: `npm test -- <test-file>`
+- **Dev**: `bun run dev` - Start Vite development server (http://localhost:5173/)
+- **Build**: `bun run build` - Build for production using Vite
+- **Preview**: `bun run preview` - Preview production build locally (http://localhost:4173/)
+- **Lint**: `bun run lint` - Run ESLint checks
+- **Test**: `bun test` or `bun run test` - Run Vitest tests. Run single test: `bun test -- <test-file>`
 
 ## Build System
 This project uses **Vite** for fast development and production builds (migrated from Vue CLI).
@@ -51,6 +51,14 @@ This project uses **Vite** for fast development and production builds (migrated 
 - SCSS compilation with source maps
 - HMR (Hot Module Replacement) in development
 - Asset optimization and code splitting in production
+
+## Package Manager
+This project uses **BUN** as the package manager (migrated from NPM):
+- 10x faster dependency installation
+- Drop-in replacement for NPM
+- Native TypeScript support
+- Unified tooling for package management and running scripts
+- Run `bun install` to install dependencies and generate bun.lock
 
 ## Documentation
 Always update **README.md** after implementing new features to:

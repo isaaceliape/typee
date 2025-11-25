@@ -5,7 +5,7 @@
 #
 # Creates a new GitHub issue with priority prefix and labels.
 # Follows the pattern: [PRIORITY]: Issue Title
-# Priority levels: 🔴 CRITICAL, 🟡 HIGH, 🟠 MEDIUM, 🟢 LOW
+# Priority levels: 🔴 CRITICAL, 🟡 HIGH, 🟠 MEDIUM, 🟢 LOW, 🟣 REFACTOR, 🔵 EPIC
 #
 # Usage:
 #   ./create-issue.sh [options]
@@ -14,7 +14,7 @@
 #   -h, --help                Show help message
 #   -t, --title <TITLE>       Issue title (required)
 #   -b, --body <BODY>         Issue body/description
-#   -p, --priority <LEVEL>    Priority: CRITICAL, HIGH, MEDIUM, LOW (default: MEDIUM)
+#   -p, --priority <LEVEL>    Priority: CRITICAL, HIGH, MEDIUM, LOW, REFACTOR, EPIC (default: MEDIUM)
 #   -l, --labels <LABELS>     Comma-separated labels (e.g., "bug,typescript")
 #   -a, --assignee <USER>     Assign to user
 #   --no-prefix               Create without priority prefix
@@ -47,12 +47,18 @@ LABELS=""
 ASSIGNEE=""
 NO_PREFIX=false
 
-# Priority emoji map
-declare -A PRIORITY_EMOJI
-PRIORITY_EMOJI[CRITICAL]="🔴 CRITICAL"
-PRIORITY_EMOJI[HIGH]="🟡 HIGH"
-PRIORITY_EMOJI[MEDIUM]="🟠 MEDIUM"
-PRIORITY_EMOJI[LOW]="🟢 LOW"
+# Helper function to get priority emoji
+get_priority_emoji() {
+    case $1 in
+        CRITICAL) echo "🔴 CRITICAL" ;;
+        HIGH) echo "🟡 HIGH" ;;
+        MEDIUM) echo "🟠 MEDIUM" ;;
+        LOW) echo "🟢 LOW" ;;
+        REFACTOR) echo "🟣 REFACTOR" ;;
+        EPIC) echo "🔵 EPIC" ;;
+        *) echo "" ;;
+    esac
+}
 
 # Helper functions
 error() {
@@ -137,7 +143,8 @@ esac
 if [ "$NO_PREFIX" = true ]; then
     FINAL_TITLE="$TITLE"
 else
-    FINAL_TITLE="${PRIORITY_EMOJI[$PRIORITY]}: $TITLE"
+    PREFIX_EMOJI=$(get_priority_emoji "$PRIORITY")
+    FINAL_TITLE="$PREFIX_EMOJI: $TITLE"
 fi
 
 # Display issue details
