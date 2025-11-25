@@ -30,6 +30,7 @@ The **GitHub Issues** is the single source of truth for project status, prioriti
 - Update issue status and labels as work progresses
 
 To manage issues, use the tools in `tools/` directory:
+- `./tools/create-issue.sh -t <TITLE> -p <PRIORITY> [options]` - Create new issue with priority prefix
 - `./tools/get-issue-by-id.sh <number>` - View specific issue details
 - `./tools/get-all-issues.sh [options]` - List and filter issues
 - `./tools/update-issue-by-id.sh <number> [options]` - Modify issue properties

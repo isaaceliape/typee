@@ -6,6 +6,7 @@ Collection of shell scripts to manage GitHub issues for the Typee project using 
 
 These tools provide command-line access to GitHub Issues management functionality:
 
+- **Create Issue** - Create new GitHub issues with priority prefixes and labels
 - **Get Issue by ID** - Retrieve specific issue information
 - **Get All Issues** - List all GitHub issues with filtering and formatting
 - **Update Issue by ID** - Modify issue properties (title, body, labels, state, assignees)
@@ -25,7 +26,85 @@ These tools provide command-line access to GitHub Issues management functionalit
 
 ## Scripts
 
-### 1. get-issue-by-id.sh
+### 1. create-issue.sh
+
+Create new GitHub issues with priority prefixes and labels following the Typee project conventions.
+
+**Priority Levels:**
+- `🔴 CRITICAL` - Critical bugs or blocking issues
+- `🟡 HIGH` - High priority features or important bug fixes
+- `🟠 MEDIUM` - Standard features and improvements (default)
+- `🟢 LOW` - Low priority enhancements or nice-to-haves
+- `🟣 REFACTOR` - Refactoring and code improvements
+- `🔵 EPIC` - Large features or epics spanning multiple issues
+
+**Usage:**
+```bash
+./create-issue.sh [options]
+```
+
+**Options:**
+- `-h, --help`: Show help message
+- `-t, --title <TITLE>`: Issue title (required)
+- `-b, --body <BODY>`: Issue description/body (optional)
+- `-p, --priority <LEVEL>`: Priority level - CRITICAL, HIGH, MEDIUM, LOW, REFACTOR, EPIC (default: MEDIUM)
+- `-l, --labels <LABELS>`: Comma-separated labels (e.g., "bug,typescript,enhancement")
+- `-a, --assignee <USER>`: Assign to GitHub username
+- `--no-prefix`: Create without priority prefix
+
+**Examples:**
+```bash
+# Create a CRITICAL bug issue with TypeScript label
+./create-issue.sh --title "App crashes on startup" --priority CRITICAL --labels "bug,typescript"
+
+# Create a HIGH priority feature
+./create-issue.sh -t "Add dark mode support" -p HIGH -l "feature,enhancement"
+
+# Create a MEDIUM priority issue with description and assignee
+./create-issue.sh --title "Refactor API client" --priority MEDIUM --body "Description here" --labels "refactoring" --assignee isaaceliape
+
+# Create without priority prefix
+./create-issue.sh --title "Minor typo fix" --labels "documentation" --no-prefix
+
+# Create an EPIC
+./create-issue.sh -t "Phase 2: Performance Optimization" -p EPIC -l "epic,tracking"
+```
+
+**Sample Output:**
+```
+════════════════════════════════════════════════════════════
+Creating Issue
+════════════════════════════════════════════════════════════
+Title: 🟠 MEDIUM: Add new feature
+Priority: MEDIUM
+Has Description: Yes
+Labels: feature,enhancement
+Assignee: isaaceliape
+════════════════════════════════════════════════════════════
+
+ℹ️  Creating issue...
+
+✅ Issue created successfully!
+ℹ️  URL: https://github.com/isaaceliape/typee/issues/29
+
+════════════════════════════════════════════════════════════
+Issue #29 created successfully!
+════════════════════════════════════════════════════════════
+```
+
+**Naming Convention:**
+- Issue titles follow the pattern: `[PRIORITY]: Description`
+- Examples:
+  - `🔴 CRITICAL: Fix event handler this binding`
+  - `🟡 HIGH: Move global state to component instances`
+  - `🟠 MEDIUM: Add JSDoc documentation`
+  - `🟢 LOW: No support to numbers`
+  - `🟣 REFACTOR: Migrate from Vuex to Pinia`
+  - `🔵 EPIC: Typee Application Progress Monitoring`
+
+---
+
+### 2. get-issue-by-id.sh
 
 Retrieve detailed information about a specific GitHub issue by its number.
 
@@ -80,7 +159,7 @@ Description:
 
 ---
 
-### 2. get-all-issues.sh
+### 3. get-all-issues.sh
 
 List all GitHub issues with filtering, sorting, and formatting options.
 
@@ -142,7 +221,7 @@ List all GitHub issues with filtering, sorting, and formatting options.
 
 ---
 
-### 3. update-issue-by-id.sh
+### 4. update-issue-by-id.sh
 
 Update GitHub issue properties (title, body, labels, state, assignees).
 
@@ -203,7 +282,7 @@ Update GitHub issue properties (title, body, labels, state, assignees).
 
 ---
 
-### 4. close-issue-by-id.sh
+### 5. close-issue-by-id.sh
 
 Close a GitHub issue (marks as closed; can be reopened if needed).
 
@@ -498,6 +577,7 @@ For issues or suggestions:
 
 | Script | Purpose | Usage |
 |--------|---------|-------|
+| `create-issue.sh` | Create new issue with priority | `./create-issue.sh -t <TITLE> -p <PRIORITY> [options]` |
 | `get-issue-by-id.sh` | Get issue details | `./get-issue-by-id.sh <number> [format]` |
 | `get-all-issues.sh` | List/filter issues | `./get-all-issues.sh [options]` |
 | `update-issue-by-id.sh` | Modify issue | `./update-issue-by-id.sh <number> [options]` |
