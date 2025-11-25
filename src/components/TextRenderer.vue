@@ -241,11 +241,12 @@ export default defineComponent({
        this.debounceTimer = setTimeout(callback, interval)
      },
     resetTyping(): void {
-      this.currentPos = 0
-      this.value = ''
-      this.setErrorCount(0)
-      this.updateViewer(this.currentSentence || '')
-    },
+       this.currentPos = 0
+       this.value = ''
+       this.setErrorCount(0)
+       this.finalText = [{ text: '&nbsp;', classes: ['active'] }]
+       this.updateViewer(this.currentSentence || '')
+     },
     preventNotAllowedKeys(e: KeyboardEvent): void {
       if(NOT_ALLOWED_KEYS.includes(e.key)) e.preventDefault()
     },
