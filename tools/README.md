@@ -4,7 +4,7 @@ Collection of shell scripts to manage GitHub issues for the Typee project using 
 
 ## Overview
 
-These tools provide command-line access to GitHub Issues management functionality:
+These tools provide command-line access to GitHub Issues management and pull request workflows:
 
 - **Create Issue** - Create new GitHub issues with priority prefixes and labels
 - **Get Issue by ID** - Retrieve specific issue information
@@ -12,6 +12,7 @@ These tools provide command-line access to GitHub Issues management functionalit
 - **Update Issue by ID** - Modify issue properties (title, body, labels, state, assignees)
 - **Close Issue by ID** - Close issues
 - **Create PR from Issue** - Create pull requests automatically from GitHub issues
+- **Merge Pull Request** - Merge pull requests with automatic branch cleanup
 
 ## Prerequisites
 
@@ -613,6 +614,117 @@ PR Information:
 
 ---
 
+### 7. merge-pull-request.sh
+
+Merge a pull request with automatic source branch cleanup. Uses squash merge strategy by default for clean commit history.
+
+**Usage:**
+```bash
+./merge-pull-request.sh [options]
+```
+
+**Options:**
+- `-h, --help`: Show help message
+- `-p, --pr <NUMBER>`: Pull request number (required)
+- `-s, --strategy <TYPE>`: Merge strategy: `squash`, `merge`, `rebase` (default: `squash`)
+- `-d, --delete-branch`: Delete source branch after merge (default behavior)
+- `--keep-branch`: Keep source branch after merge (don't delete)
+- `-f, --force`: Skip confirmation prompt
+- `--dry-run`: Show what would be done without applying
+- `-m, --message <MSG>`: Custom commit message (for squash merge)
+
+**Examples:**
+```bash
+# Merge PR #35 using squash strategy and delete branch
+./merge-pull-request.sh --pr 35
+
+# Merge with rebase strategy
+./merge-pull-request.sh -p 35 --strategy rebase
+
+# Merge without deleting source branch
+./merge-pull-request.sh --pr 33 --keep-branch
+
+# Force merge without confirmation
+./merge-pull-request.sh -p 34 --force
+
+# Preview merge without applying
+./merge-pull-request.sh --pr 36 --dry-run
+
+# Merge using standard merge strategy
+./merge-pull-request.sh --pr 37 --strategy merge --force
+```
+
+**Merge Strategies:**
+- **squash** (default) - Squash all commits into single commit for clean history
+- **merge** - Create merge commit preserving all commit history
+- **rebase** - Rebase commits on top of target branch
+
+**How It Works:**
+
+1. Fetches PR details from GitHub
+2. Validates PR state and status checks
+3. Merges PR using specified strategy
+4. Automatically deletes source branch (unless `--keep-branch` is used)
+5. Displays merge summary and next steps
+
+**Features:**
+- ✅ Multiple merge strategies supported
+- ✅ Automatic branch cleanup after merge
+- ✅ Status check verification
+- ✅ Dry-run mode for safe preview
+- ✅ Force mode for automation
+- ✅ Confirmation prompt (optional)
+- ✅ Clear error handling
+
+**Sample Output:**
+```
+════════════════════════════════════════════════════════════
+Merge Pull Request with Branch Cleanup
+════════════════════════════════════════════════════════════
+
+ℹ️  Fetching PR #35 details...
+
+Pull Request Information:
+  Number: #35
+  Title: ci/cd: simplify lint workflow and fix status check recognition
+  State: OPEN
+  Source Branch: ci/cd-fix-workflow
+  Target Branch: master
+  Merge Strategy: squash
+  Delete Branch: Yes
+
+This will:
+  1. Merge PR #35 using squash strategy
+  2. Delete source branch: ci/cd-fix-workflow
+
+Continue? (y/N): y
+
+ℹ️  Merging PR #35 using squash strategy...
+✅ PR #35 merged successfully
+
+ℹ️  Deleting source branch: ci/cd-fix-workflow
+✅ Source branch deleted: ci/cd-fix-workflow
+
+════════════════════════════════════════════════════════════
+Pull Request Merged Successfully!
+════════════════════════════════════════════════════════════
+PR #35 has been merged into master
+Source branch has been cleaned up
+
+Next Steps:
+  1. Pull latest changes: git pull origin master
+  2. Delete local branch: git branch -d ci/cd-fix-workflow
+  3. Continue with next task
+
+Merge Details:
+  PR: #35 - ci/cd: simplify lint workflow
+  Strategy: squash
+  Source → Target: ci/cd-fix-workflow → master
+════════════════════════════════════════════════════════════
+```
+
+---
+
 ## Common Workflows
 
 ### Workflow 1: Check Specific Issue Status
@@ -703,9 +815,32 @@ done
 # Create PR with custom base branch
 ./create-pr-from-issue.sh --issue 28 --base develop --auto-format
 
-# Create PR from current branch (don't create new branch)
-git checkout -b my-branch
-./create-pr-from-issue.sh --issue 29 --no-branch --title "Custom PR title"
+### Workflow 7: Merge Pull Request with Branch Cleanup
+```bash
+# Merge PR #35 using squash strategy and delete branch
+./merge-pull-request.sh --pr 35
+
+# Merge PR #36 with rebase strategy without deleting branch
+./merge-pull-request.sh -p 36 --strategy rebase --keep-branch
+
+# Preview merge before applying
+./merge-pull-request.sh --pr 37 --dry-run
+
+# Force merge without confirmation prompt
+./merge-pull-request.sh --pr 38 --force
+
+# Merge multiple PRs in sequence
+for pr in 35 36 37; do
+  ./merge-pull-request.sh --pr "$pr" --force
+done
+
+# Merge with custom merge message
+./merge-pull-request.sh --pr 39 --message "chore: merge PR #39 with improvements"
+
+# Automated PR merge workflow with branch cleanup
+gh pr list --state open --json number,headRefName | jq -r '.[] | "\(.number) \(.headRefName)"' | while read pr branch; do
+  ./merge-pull-request.sh --pr "$pr" --force
+done
 ```
 
 ---
@@ -886,6 +1021,7 @@ For issues or suggestions:
 | `update-issue-by-id.sh` | Modify issue | `./update-issue-by-id.sh <number> [options]` |
 | `close-issue-by-id.sh` | Close issue | `./close-issue-by-id.sh <number> [options]` |
 | `create-pr-from-issue.sh` | Create PR from issue | `./create-pr-from-issue.sh --issue <NUMBER> [options]` |
+| `merge-pull-request.sh` | Merge PR and cleanup branch | `./merge-pull-request.sh --pr <NUMBER> [options]` |
 
 ---
 
