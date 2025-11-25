@@ -6,8 +6,8 @@
         <th>Sentences</th>
       </tr>
       <tr>
-        <td><span class="errors">{{ errorCount }}</span></td>
-        <td><span class="errors">{{ sentencePos + 1 }} of {{ getSentencesCount }}</span></td>
+        <td><span class="errors">{{ store.errorCount }}</span></td>
+        <td><span class="errors">{{ store.sentencePos + 1 }} of {{ store.getSentencesCount }}</span></td>
       </tr>
     </table>
   </div>
@@ -15,23 +15,14 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { useStore } from 'vuex'
-import { mapAppState, mapAppGetters, mapAppMutations } from '../helpers'
+import { useAppStore } from '../store/app'
 
 export default defineComponent({
   setup() {
-    const store = useStore()
+    const store = useAppStore()
     
     return {
-      ...mapAppState([
-        'errorCount',
-        'fontSize',
-        'sentences',
-        'sentencePos',
-        'showCapitalLetters',
-      ], store),
-      ...mapAppGetters(['getSentencesCount'], store),
-      ...mapAppMutations(['toggleCapitalLetters'], store)
+      store,
     }
   }
 })

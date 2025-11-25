@@ -1,9 +1,9 @@
 <template>
   <div
     class="Menu"
-    :class="{ hide: !disableTyping }"
+    :class="{ hide: !store.disableTyping }"
   >
-    <BurgerMenu @click="onClickBurgerMenu" />
+    <BurgerMenu @click="store.toggleMenuOpen" />
     <div
       class="content"
       :class="menuHiddenClass"
@@ -13,24 +13,24 @@
           <td>Capital letters</td>
           <td>
             <ToggleButton
-              :active="showCapitalLetters"
-              @on-click-toggle-button="toggleCapitalLetters"
+              :active="store.showCapitalLetters"
+              @on-click-toggle-button="store.toggleCapitalLetters"
             />
           </td>
         </tr>
         <tr>
           <td>Text size</td>
           <td class="fontSizeControler">
-            <span class="currentFontSize">{{ fontSize }}</span>
+            <span class="currentFontSize">{{ store.fontSize }}</span>
             <button
               class="fontSizeControlerButtons"
-              @click="increaseFontSize"
+              @click="store.increaseFontSize"
             >
               +
             </button>
             <button
               class="fontSizeControlerButtons"
-              @click="decreaseFontSize"
+              @click="store.decreaseFontSize"
             >
               -
             </button>
@@ -41,10 +41,10 @@
           <td>
             <select v-model="selectedFontValue">
               <option
-                v-for="{ value, text } in fonts"
+                v-for="{ value, text } in store.fonts"
                 :key="value"
                 :value="value"
-                :selected="value === selectedFont ? 'selected' : false"
+                :selected="value === store.selectedFont ? 'selected' : false"
               >
                 {{ text }}
               </option>
@@ -53,7 +53,7 @@
         </tr>
         <tr>
           <td>Words per sentence</td>
-          <td>{{ wordsPerSentence }}</td>
+          <td>{{ store.wordsPerSentence }}</td>
         </tr>
       </table>
     </div>
@@ -62,8 +62,7 @@
 
 <script lang="ts">
 import { defineComponent, computed } from 'vue'
-import { useStore } from 'vuex'
-import { mapAppState, mapAppMutations } from '../helpers'
+import { useAppStore } from '../store/app'
 
 import ToggleButton from './ToggleButton.vue'
 import BurgerMenu from './BurgerMenu.vue'
@@ -74,43 +73,24 @@ export default defineComponent({
     ToggleButton,
   },
   setup() {
-    const store = useStore()
+    const store = useAppStore()
 
-    const appState = mapAppState([
-      'fonts',
-      'fontSize',
-      'menuOpen',
-      'selectedFont',
-      'wordsPerSentence',
-      'disableTyping',
-      'showCapitalLetters',
-    ], store)
-    const appMutations = mapAppMutations([
-      'toggleMenuOpen',
-      'setSelectedFont',
-      'increaseFontSize',
-      'decreaseFontSize',
-      'setDisableTyping',
-      'toggleCapitalLetters',
-    ], store)
-
-    const menuHiddenClass = computed(() => appState.menuOpen.value ? '' : 'hide')
+    const menuHiddenClass = computed(() => store.menuOpen ? '' : 'hide')
 
     const selectedFontValue = computed({
-      get: () => appState.selectedFont.value,
+      get: () => store.selectedFont,
       set: (value: string) => {
-        appMutations.setSelectedFont(value)
+        store.setSelectedFont(value)
       }
     })
 
     function onClickBurgerMenu(): void {
-      appMutations.toggleMenuOpen()
-      if (!appState.disableTyping.value) appMutations.setDisableTyping(true)
+      store.toggleMenuOpen()
+      if (!store.disableTyping) store.setDisableTyping(true)
     }
 
     return {
-      ...appState,
-      ...appMutations,
+      store,
       menuHiddenClass,
       onClickBurgerMenu,
       selectedFontValue,

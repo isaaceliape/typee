@@ -60,7 +60,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import * as R from 'ramda'
-import { mapState, mapMutations, mapGetters } from 'vuex'
+import { useAppStore } from '../store/app'
 
 import Letter from './Letter.vue'
 import InfoPanel from './InfoPanel.vue'
@@ -93,29 +93,49 @@ export default defineComponent({
       articleTitle: '',
       onKeydownHandler: null as ((e: KeyboardEvent) => void) | null,
       debounceTimer: null as number | null,
+      store: {} as ReturnType<typeof useAppStore>,
     }
   },
   computed: {
-    ...mapState([
-      'fontSize',
-      'sentences',
-      'wordsCount',
-      'errorCount',
-      'sentencePos',
-      'selectedFont',
-      'disableTyping',
-      'wordsPerSentence',
-      'showCapitalLetters',
-    ]),
-    ...mapGetters([
-      'getSentencesCount',
-    ]),
+    fontSize(): number {
+      return this.store.fontSize
+    },
+    sentences(): string[] {
+      return this.store.sentences
+    },
+    wordsCount(): number {
+      return this.store.wordsCount
+    },
+    errorCount(): number {
+      return this.store.errorCount
+    },
+    sentencePos(): number {
+      return this.store.sentencePos
+    },
+    selectedFont(): string {
+      return this.store.selectedFont
+    },
+    disableTyping(): boolean {
+      return this.store.disableTyping
+    },
+    wordsPerSentence(): number {
+      return this.store.wordsPerSentence
+    },
+    showCapitalLetters(): boolean {
+      return this.store.showCapitalLetters
+    },
+    getSentencesCount(): number {
+      return this.store.getSentencesCount
+    },
     toogleTypingBtnText(): string {
       const action = this.disableTyping ? 'start' : 'stop'
       return `${action} typing`
     },
     nextLetter(): string | undefined {
-      return this.currentSentence ? this.currentSentence[this.value.length] : undefined
+      return this.currentSentence ? this.currentSentence[this.currentValue.length] : undefined
+    },
+    currentValue(): string {
+      return this.value
     }
   },
   watch: {
@@ -127,21 +147,36 @@ export default defineComponent({
       this.updateViewer(currentText)
     }
   },
+  created() {
+    this.store = useAppStore()
+  },
   mounted(){
     this.updateCurrentSentence(0)
     this.updateViewer(this.currentSentence || '')
     this.onClickToogleTyping()
   },
   methods: {
-    ...mapMutations([
-      'setMenuOpen',
-      'setWordsCount',
-      'setErrorCount',
-      'setSentencePos',
-      'setDisableTyping',
-      'setSentences',
-      'increaseErrorCount',
-    ]),
+    setMenuOpen(value: boolean): void {
+      this.store.setMenuOpen(value)
+    },
+    setWordsCount(value: number): void {
+      this.store.setWordsCount(value)
+    },
+    setErrorCount(value: number): void {
+      this.store.setErrorCount(value)
+    },
+    setSentencePos(value: number): void {
+      this.store.setSentencePos(value)
+    },
+    setDisableTyping(value: boolean): void {
+      this.store.setDisableTyping(value)
+    },
+    setSentences(value: string[]): void {
+      this.store.setSentences(value)
+    },
+    increaseErrorCount(): void {
+      this.store.increaseErrorCount()
+    },
     updateErrorCount(currentSentence: string, currentText: string, currPosLetter: number): void {
       if(currentSentence[currPosLetter] !== currentText[currPosLetter]) this.increaseErrorCount()
     },

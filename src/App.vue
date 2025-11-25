@@ -7,8 +7,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { mapState, mapMutations } from 'vuex'
 import { updateSelectedFont } from './helpers'
+import { useAppStore } from './store/app'
 
 import Menu from './components/Menu.vue'
 import TextRenderer from './components/TextRenderer.vue'
@@ -26,11 +26,17 @@ export default defineComponent({
       { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Ubuntu+Mono:wght@400;700&display=swap' },
     ],
   },
+  setup() {
+    const store = useAppStore()
+    return { store }
+  },
   computed: {
-    ...mapState([
-      'selectedFont',
-      'fonts',
-    ])
+    selectedFont(): string {
+      return this.store.selectedFont
+    },
+    fonts() {
+      return this.store.fonts
+    },
   },
   watch: {
     selectedFont(value: string) {
@@ -38,16 +44,11 @@ export default defineComponent({
     },
   },
   mounted() {
-    if (!this.selectedFont) this.setSelectedFont(this.fonts[1])
-    updateSelectedFont(this.selectedFont)
+    if (!this.store.selectedFont) this.store.setSelectedFont(this.store.fonts[1].value)
+    updateSelectedFont(this.store.selectedFont)
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js')
     }
-  },
-  methods: {
-    ...mapMutations([
-      'setSelectedFont',
-    ]),
   },
 })
 </script>

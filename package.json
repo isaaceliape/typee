@@ -15,6 +15,7 @@
     "core-js": "^3.6.5",
     "es6-promise": "^4.2.8",
     "pascal-case": "^3.1.2",
+    "pinia": "^3.0.4",
     "ramda": "^0.27.1",
     "vue": "^3.5.25",
     "vue-head": "^2.2.0",
@@ -24,6 +25,7 @@
     "xml2js": "^0.4.23"
   },
   "devDependencies": {
+    "@testing-library/vue": "^8.1.0",
     "@types/node": "^24.10.1",
     "@types/ramda": "^0.31.1",
     "@types/xml2js": "^0.4.14",
@@ -37,6 +39,7 @@
     "eslint": "^8.57.1",
     "eslint-plugin-vue": "^7.0.0-alpha.0",
     "happy-dom": "^20.0.10",
+    "jsdom": "^27.2.0",
     "sass": "^1.94.2",
     "sass-loader": "^10.1.0",
     "typescript": "^5.9.3",
