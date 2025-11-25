@@ -92,6 +92,7 @@ export default defineComponent({
       sourceText: mock_data,
       article: '',
       articleTitle: '',
+      onKeydownHandler: null as ((e: KeyboardEvent) => void) | null,
     }
   },
   computed: {
@@ -222,25 +223,29 @@ export default defineComponent({
         this.currentSentence = this.sentences[this.sentencePos]
       }
     },
-    onClickToogleTyping(): void {
-      const { userInput } = this.$refs as { userInput: HTMLInputElement }
-      let sentence = this.currentSentence
-      this.resetTyping()
-      this.setDisableTyping(!this.disableTyping)
-      this.setMenuOpen(false)
-      this.updateCurrentSentence(0)
+     onClickToogleTyping(): void {
+       const { userInput } = this.$refs as { userInput: HTMLInputElement }
+       let sentence = this.currentSentence
+       this.resetTyping()
+       this.setDisableTyping(!this.disableTyping)
+       this.setMenuOpen(false)
+       this.updateCurrentSentence(0)
 
-      userInput.removeAttribute('disabled')
-      userInput.focus()
-      sentence = this.showCapitalLetters && sentence ? sentence : sentence?.toLowerCase() || ''
-      this.updateViewer(sentence)
-      document.addEventListener('keydown', this.onKeydown)
-    },
-    onDisableTyping(): void {
-      this.setDisableTyping(true)
-      this.setMenuOpen(false)
-      document.removeEventListener('keydown', this.onKeydown)
-    }
+       userInput.removeAttribute('disabled')
+       userInput.focus()
+       sentence = this.showCapitalLetters && sentence ? sentence : sentence?.toLowerCase() || ''
+       this.updateViewer(sentence)
+       this.onKeydownHandler = (e: KeyboardEvent) => this.onKeydown(e)
+       document.addEventListener('keydown', this.onKeydownHandler)
+     },
+     onDisableTyping(): void {
+       this.setDisableTyping(true)
+       this.setMenuOpen(false)
+       if (this.onKeydownHandler) {
+         document.removeEventListener('keydown', this.onKeydownHandler)
+         this.onKeydownHandler = null
+       }
+     }
   },
 })
 </script>
