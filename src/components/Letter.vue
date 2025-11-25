@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, type PropType } from 'vue'
 
 export default defineComponent({
   props: {
@@ -18,7 +18,7 @@ export default defineComponent({
       default: '' ,
     },
     classes: {
-      type: Array as () => string[],
+      type: Array as PropType<string[]>,
       default: () => [],
     }
   }
