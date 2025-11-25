@@ -33,12 +33,16 @@ table {
   margin: 0 auto;
   text-align: center;
   border-collapse: separate;
-  border: 1px solid black;
+  border: 1px solid var(--border-color);
   border-radius: 3px;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
   th,
   td {
     border-right: 0;
     border-top: 0;
+    color: var(--text-color);
     &:first-child {
       border-left: 0;
     }

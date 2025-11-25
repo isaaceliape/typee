@@ -27,18 +27,17 @@ export default defineComponent({
 
 <style lang="scss" scoped>
   .ToggleButton {
-    border: 1px solid;
+    border: 1px solid var(--border-color);
     border-radius: 5px;
-  }
-  .ToggleButton {
     width: 60px;
     height: 20px;
     cursor: pointer;
     margin: 0 auto;
+    transition: border-color 0.3s ease;
     &.active {
       .knob {
         transform: translateX(0%);
-        border-right: 1px solid;
+        border-right: 1px solid var(--border-color);
         border-left: 0;
         opacity: 1;
       }
@@ -52,7 +51,7 @@ export default defineComponent({
     opacity: .5;
     transition: all 150ms ease;
     transform: translateX(100%);
-    border-left: 1px solid;
+    border-left: 1px solid var(--border-color);
     border-radius: 5px;
   }
 </style>
