@@ -17,11 +17,14 @@
 #   -p, --priority <LEVEL>    Priority: CRITICAL, HIGH, MEDIUM, LOW, REFACTOR, EPIC (default: MEDIUM)
 #   -l, --labels <LABELS>     Comma-separated labels (e.g., "bug,typescript")
 #   -a, --assignee <USER>     Assign to user
+#   --template <TYPE>         Use template: scrum, feature, bug, refactor (optional)
+#   --story-points <POINTS>   Scrum story points (for scrum template)
 #   --no-prefix               Create without priority prefix
 
 # Examples:
 #   ./create-issue.sh --title "Add feature X" --priority HIGH --labels "feature,enhancement"
 #   ./create-issue.sh -t "Fix bug Y" -p CRITICAL -l "bug,typescript" -b "Description here"
+#   ./create-issue.sh --title "User login feature" --priority HIGH --template scrum --story-points 5
 #   ./create-issue.sh --title "Refactor module Z" --priority MEDIUM --labels "refactoring"
 #
 # Requirements:
@@ -46,6 +49,8 @@ BODY=""
 LABELS=""
 ASSIGNEE=""
 NO_PREFIX=false
+TEMPLATE=""
+STORY_POINTS=""
 
 # Helper function to get priority emoji
 get_priority_emoji() {
@@ -58,6 +63,141 @@ get_priority_emoji() {
         EPIC) echo "🔵 EPIC" ;;
         *) echo "" ;;
     esac
+}
+
+# Helper function to generate Scrum user story template
+generate_scrum_template() {
+    local title="$1"
+    local story_points="$2"
+    
+    local template="## User Story
+
+As a **role/persona**,  
+I want to **action/feature**,  
+So that I can **benefit/value**.
+
+## Description
+
+Provide a brief description of the feature or capability being requested.
+
+## Acceptance Criteria
+
+- [ ] Criterion 1
+- [ ] Criterion 2
+- [ ] Criterion 3
+
+## Implementation Notes
+
+- Technical considerations
+- Dependencies
+- Potential risks
+
+## Definition of Done
+
+- [ ] Code implemented
+- [ ] Unit tests written
+- [ ] Tests passing
+- [ ] Code reviewed
+- [ ] Merged to main branch
+- [ ] Documentation updated"
+
+    if [ -n "$story_points" ]; then
+        template="## Story Points
+
+**$story_points**
+
+$template"
+    fi
+    
+    echo "$template"
+}
+
+# Helper function to generate Feature template
+generate_feature_template() {
+    local template="## Feature Request
+
+### Description
+Brief description of the feature.
+
+### Motivation
+Why is this feature needed?
+
+### Expected Behavior
+What should happen when this feature is implemented?
+
+### Acceptance Criteria
+
+- [ ] Criterion 1
+- [ ] Criterion 2
+- [ ] Criterion 3
+
+### Implementation Details
+
+- Implementation approach
+- Dependencies
+- Affected components"
+
+    echo "$template"
+}
+
+# Helper function to generate Bug template
+generate_bug_template() {
+    local template="## Bug Report
+
+### Description
+Clear description of the bug.
+
+### Steps to Reproduce
+
+1. Step 1
+2. Step 2
+3. Step 3
+
+### Expected Behavior
+What should happen?
+
+### Actual Behavior
+What actually happens?
+
+### Environment
+
+- OS: 
+- Browser/Runtime: 
+- Version: 
+
+### Additional Context
+
+Any additional information, screenshots, or logs."
+
+    echo "$template"
+}
+
+# Helper function to generate Refactor template
+generate_refactor_template() {
+    local template="## Refactoring
+
+### Current State
+Current implementation details.
+
+### Proposed Changes
+What needs to be refactored and why?
+
+### Benefits
+
+- Benefit 1
+- Benefit 2
+- Benefit 3
+
+### Implementation Plan
+
+1. Step 1
+2. Step 2
+3. Step 3
+
+### Testing Strategy
+How will we verify the refactor doesn't introduce regressions?"
+
+    echo "$template"
 }
 
 # Helper functions
@@ -115,6 +255,14 @@ while [[ $# -gt 0 ]]; do
             ASSIGNEE="$2"
             shift 2
             ;;
+        --template)
+            TEMPLATE="$2"
+            shift 2
+            ;;
+        --story-points)
+            STORY_POINTS="$2"
+            shift 2
+            ;;
         --no-prefix)
             NO_PREFIX=true
             shift
@@ -132,12 +280,41 @@ fi
 
 # Validate priority
 case $PRIORITY in
-    CRITICAL|HIGH|MEDIUM|LOW)
+    CRITICAL|HIGH|MEDIUM|LOW|REFACTOR|EPIC)
         ;;
     *)
-        error "Invalid priority: $PRIORITY. Use: CRITICAL, HIGH, MEDIUM, or LOW"
+        error "Invalid priority: $PRIORITY. Use: CRITICAL, HIGH, MEDIUM, LOW, REFACTOR, or EPIC"
         ;;
 esac
+
+# Validate template if provided
+if [ -n "$TEMPLATE" ]; then
+    case $TEMPLATE in
+        scrum|feature|bug|refactor)
+            ;;
+        *)
+            error "Invalid template: $TEMPLATE. Use: scrum, feature, bug, or refactor"
+            ;;
+    esac
+fi
+
+# Generate body from template if specified
+if [ -n "$TEMPLATE" ] && [ -z "$BODY" ]; then
+    case $TEMPLATE in
+        scrum)
+            BODY=$(generate_scrum_template "$TITLE" "$STORY_POINTS")
+            ;;
+        feature)
+            BODY=$(generate_feature_template)
+            ;;
+        bug)
+            BODY=$(generate_bug_template)
+            ;;
+        refactor)
+            BODY=$(generate_refactor_template)
+            ;;
+    esac
+fi
 
 # Build final title with prefix
 if [ "$NO_PREFIX" = true ]; then
@@ -153,6 +330,8 @@ echo "Creating Issue"
 echo "════════════════════════════════════════════════════════════"
 echo "Title: $FINAL_TITLE"
 echo "Priority: $PRIORITY"
+[ -n "$TEMPLATE" ] && echo "Template: $TEMPLATE" || true
+[ -n "$STORY_POINTS" ] && echo "Story Points: $STORY_POINTS" || true
 [ -n "$BODY" ] && echo "Has Description: Yes" || echo "Has Description: No"
 [ -n "$LABELS" ] && echo "Labels: $LABELS" || echo "Labels: None"
 [ -n "$ASSIGNEE" ] && echo "Assignee: $ASSIGNEE" || echo "Assignee: None"

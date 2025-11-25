@@ -38,6 +38,12 @@ Create new GitHub issues with priority prefixes and labels following the Typee p
 - `🟣 REFACTOR` - Refactoring and code improvements
 - `🔵 EPIC` - Large features or epics spanning multiple issues
 
+**Templates:**
+- `scrum` - Scrum user story format with acceptance criteria
+- `feature` - Feature request template
+- `bug` - Bug report template
+- `refactor` - Code refactoring template
+
 **Usage:**
 ```bash
 ./create-issue.sh [options]
@@ -46,10 +52,12 @@ Create new GitHub issues with priority prefixes and labels following the Typee p
 **Options:**
 - `-h, --help`: Show help message
 - `-t, --title <TITLE>`: Issue title (required)
-- `-b, --body <BODY>`: Issue description/body (optional)
+- `-b, --body <BODY>`: Issue description/body (optional, overrides template)
 - `-p, --priority <LEVEL>`: Priority level - CRITICAL, HIGH, MEDIUM, LOW, REFACTOR, EPIC (default: MEDIUM)
 - `-l, --labels <LABELS>`: Comma-separated labels (e.g., "bug,typescript,enhancement")
 - `-a, --assignee <USER>`: Assign to GitHub username
+- `--template <TYPE>`: Template to use - scrum, feature, bug, refactor (optional)
+- `--story-points <POINTS>`: Scrum story points (only with scrum template)
 - `--no-prefix`: Create without priority prefix
 
 **Examples:**
@@ -59,6 +67,18 @@ Create new GitHub issues with priority prefixes and labels following the Typee p
 
 # Create a HIGH priority feature
 ./create-issue.sh -t "Add dark mode support" -p HIGH -l "feature,enhancement"
+
+# Create a SCRUM user story with 8 story points
+./create-issue.sh --title "Implement user authentication" --priority HIGH --template scrum --story-points 8 --labels "feature,security"
+
+# Create a feature with feature template
+./create-issue.sh --title "Add export to PDF" --priority MEDIUM --template feature --labels "feature,enhancement"
+
+# Create a bug report using bug template
+./create-issue.sh --title "Login button unresponsive" --priority HIGH --template bug --labels "bug,critical"
+
+# Create a refactoring issue with refactor template
+./create-issue.sh --title "Optimize database queries" --priority MEDIUM --template refactor --labels "performance,refactoring"
 
 # Create a MEDIUM priority issue with description and assignee
 ./create-issue.sh --title "Refactor API client" --priority MEDIUM --body "Description here" --labels "refactoring" --assignee isaaceliape
@@ -70,6 +90,115 @@ Create new GitHub issues with priority prefixes and labels following the Typee p
 ./create-issue.sh -t "Phase 2: Performance Optimization" -p EPIC -l "epic,tracking"
 ```
 
+**Template Details:**
+
+**Scrum Template:**
+```
+## Story Points
+[Points]
+
+## User Story
+As a **role/persona**,
+I want to **action/feature**,
+So that I can **benefit/value**.
+
+## Description
+[Brief description]
+
+## Acceptance Criteria
+- [ ] Criterion 1
+- [ ] Criterion 2
+- [ ] Criterion 3
+
+## Implementation Notes
+- Technical considerations
+- Dependencies
+- Potential risks
+
+## Definition of Done
+- [ ] Code implemented
+- [ ] Unit tests written
+- [ ] Tests passing
+- [ ] Code reviewed
+- [ ] Merged to main branch
+- [ ] Documentation updated
+```
+
+**Feature Template:**
+```
+## Feature Request
+
+### Description
+Brief description of the feature.
+
+### Motivation
+Why is this feature needed?
+
+### Expected Behavior
+What should happen when this feature is implemented?
+
+### Acceptance Criteria
+- [ ] Criterion 1
+- [ ] Criterion 2
+- [ ] Criterion 3
+
+### Implementation Details
+- Implementation approach
+- Dependencies
+- Affected components
+```
+
+**Bug Template:**
+```
+## Bug Report
+
+### Description
+Clear description of the bug.
+
+### Steps to Reproduce
+1. Step 1
+2. Step 2
+3. Step 3
+
+### Expected Behavior
+What should happen?
+
+### Actual Behavior
+What actually happens?
+
+### Environment
+- OS: 
+- Browser/Runtime: 
+- Version: 
+
+### Additional Context
+Any additional information, screenshots, or logs.
+```
+
+**Refactor Template:**
+```
+## Refactoring
+
+### Current State
+Current implementation details.
+
+### Proposed Changes
+What needs to be refactored and why?
+
+### Benefits
+- Benefit 1
+- Benefit 2
+- Benefit 3
+
+### Implementation Plan
+1. Step 1
+2. Step 2
+3. Step 3
+
+### Testing Strategy
+How will we verify the refactor doesn't introduce regressions?
+```
+
 **Sample Output:**
 ```
 ════════════════════════════════════════════════════════════
@@ -77,6 +206,8 @@ Creating Issue
 ════════════════════════════════════════════════════════════
 Title: 🟠 MEDIUM: Add new feature
 Priority: MEDIUM
+Template: scrum
+Story Points: 5
 Has Description: Yes
 Labels: feature,enhancement
 Assignee: isaaceliape
