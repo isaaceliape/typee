@@ -5,14 +5,15 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { mapState, mapMutations } from 'vuex'
-import { updateSelectedFont } from './helpers.js'
+import { updateSelectedFont } from './helpers'
 
 import Menu from './components/Menu.vue'
 import TextRenderer from './components/TextRenderer.vue'
 
-export default {
+export default defineComponent({
   name: 'App',
   components: {
     Menu,
@@ -20,9 +21,9 @@ export default {
   },
   head: {
     link: [
-      { rel: 'preconnect', href: 'https://fonts.gstatic.com'},
-      { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap'},
-      { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Ubuntu+Mono:wght@400;700&display=swap'},
+      { rel: 'preconnect', href: 'https://fonts.gstatic.com' },
+      { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap' },
+      { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Ubuntu+Mono:wght@400;700&display=swap' },
     ],
   },
   computed: {
@@ -32,14 +33,14 @@ export default {
     ])
   },
   watch: {
-    selectedFont(value) {
+    selectedFont(value: string) {
       updateSelectedFont(value)
     },
   },
   mounted() {
-    if(!this.selectedFont) this.setSelectedFont(this.fonts[1])
+    if (!this.selectedFont) this.setSelectedFont(this.fonts[1])
     updateSelectedFont(this.selectedFont)
-    if('serviceWorker' in navigator) {
+    if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js')
     }
   },
@@ -48,7 +49,7 @@ export default {
       'setSelectedFont',
     ]),
   },
-}
+})
 </script>
 
 <style lang="scss">

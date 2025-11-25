@@ -21,15 +21,21 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+interface KeymapData {
+  keys: string[][]
+}
+
+export default defineComponent({
   props: {
     selectedKey: {
       type: String,
       default: '',
     }
   },
-  data() {
+  data(): KeymapData {
     return {
       keys: [
         ['Q','W','E','R','T','Y','U','I','O','P'],
@@ -39,7 +45,7 @@ export default {
       ]
     }
   },
-}
+})
 </script>
 <style lang="scss" scoped>
   .Keymap {

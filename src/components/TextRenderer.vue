@@ -57,7 +57,8 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import * as R from 'ramda'
 import { mapState, mapMutations, mapGetters } from 'vuex'
 
@@ -67,11 +68,16 @@ import Keymap from './Keymap.vue'
 
 import mostCommonEnglishWords from '../assets/1000EnglishWords'
 
+interface LetterData {
+  text: string
+  classes: string[]
+}
+
 const mock_data = mostCommonEnglishWords.sort(() => Math.random() - 0.5).join(' ')
 const NOT_ALLOWED_KEYS = ['ArrowLeft','ArrowRight','Tab']
-let debounceTimer = null
+let debounceTimer: number | null = null
 
-export default {
+export default defineComponent({
   components: {
     InfoPanel,
     Letter,
@@ -81,8 +87,8 @@ export default {
     return {
       currentPos: 0,
       value: '',
-      currentSentence: null,
-      finalText: [{ text: '&nbsp;', classes: ['active'] }],
+      currentSentence: null as string | null,
+      finalText: [{ text: '&nbsp;', classes: ['active'] }] as LetterData[],
       sourceText: mock_data,
       article: '',
       articleTitle: '',
@@ -103,17 +109,17 @@ export default {
     ...mapGetters([
       'getSentencesCount',
     ]),
-    toogleTypingBtnText(){
+    toogleTypingBtnText(): string {
       const action = this.disableTyping ? 'start' : 'stop'
       return `${action} typing`
     },
-    nextLetter() {
-      return this.currentSentence[this.value.length]
+    nextLetter(): string | undefined {
+      return this.currentSentence ? this.currentSentence[this.value.length] : undefined
     }
   },
   watch: {
-    value(currentText) {
-      if (currentText.length >= this.currentSentence.length) {
+    value(currentText: string) {
+      if (this.currentSentence && currentText.length >= this.currentSentence.length) {
         this.updateCurrentSentence(this.sentencePos + 1)
         this.resetTyping()
       }
@@ -122,7 +128,7 @@ export default {
   },
   mounted(){
     this.updateCurrentSentence(0)
-    this.updateViewer(this.currentSentence)
+    this.updateViewer(this.currentSentence || '')
     this.onClickToogleTyping()
   },
   methods: {
@@ -135,19 +141,19 @@ export default {
       'setSentences',
       'increaseErrorCount',
     ]),
-    updateErrorCount(currentSentence, currentText, currPosLetter) {
+    updateErrorCount(currentSentence: string, currentText: string, currPosLetter: number): void {
       if(currentSentence[currPosLetter] !== currentText[currPosLetter]) this.increaseErrorCount()
     },
-    updateWordsCount() {
+    updateWordsCount(): void {
       const count = this.value
         .split(' ').length - 1
       this.setWordsCount(count)
     },
-    updateViewer(text) {
-      let analizedText = []
+    updateViewer(text: string): void {
+      let analizedText: LetterData[] = []
       let currPosLetter = 0
       const parsedText = text.replace(/ /g, '␣')
-      let parsedCurrentSentence = this.currentSentence.replace(/ /g, '␣')
+      let parsedCurrentSentence = this.currentSentence ? this.currentSentence.replace(/ /g, '␣') : ''
       if(!this.showCapitalLetters) parsedCurrentSentence = parsedCurrentSentence.toLowerCase()
       for (let i = 0; i < parsedCurrentSentence.length; i++) {
         const currPosText = parsedText[i]
@@ -165,23 +171,23 @@ export default {
           classes.push(status)
         }
         if (currPosSentenceText === '␣') classes.push('space')
-        const finalLetter = {
+        const finalLetter: LetterData = {
           text: finalText,
           classes,
         }
         analizedText.push(finalLetter)
       }
       this.updateErrorCount(parsedCurrentSentence, parsedText, currPosLetter)
-      this.updateWordsCount(parsedText, currPosLetter)
+      this.updateWordsCount()
       this.finalText = analizedText
       this.updateCaretPos()
     },
-    updateCaretPos() {
+    updateCaretPos(): void {
       this.$nextTick(() => {
-        const activeLetterEl = document.querySelector('.viewer .active')
-        const caret = document.querySelector('.caret')
-        caret.classList.remove('animate')
-        if (!activeLetterEl) return 
+        const activeLetterEl = document.querySelector('.viewer .active') as HTMLElement | null
+        const caret = document.querySelector('.caret') as HTMLElement | null
+        if (caret) caret.classList.remove('animate')
+        if (!activeLetterEl || !caret) return 
         const { y, x } = activeLetterEl.getBoundingClientRect()
         const topExtaPixels = (y / 100) * 2
         caret.style.left = `${x - 1}px`
@@ -189,35 +195,35 @@ export default {
         this.debounce(() => caret.classList.add('animate'), 100)
       })
     },
-    onKeydown(e) {
+    onKeydown(e: KeyboardEvent): void {
       this.preventNotAllowedKeys(e)
       if (this.value === '') return
       if (e.key === 'Tab') this.resetTyping()
     },
-    debounce(callback, interval = 300) {
-      clearTimeout(debounceTimer)
+    debounce(callback: () => void, interval = 300): void {
+      if (debounceTimer) clearTimeout(debounceTimer)
       debounceTimer = setTimeout(callback, interval)
     },
-    resetTyping() {
+    resetTyping(): void {
       this.currentPos = 0
       this.value = ''
       this.setErrorCount(0)
-      this.updateViewer(this.currentSentence)
+      this.updateViewer(this.currentSentence || '')
     },
-    preventNotAllowedKeys(e) {
+    preventNotAllowedKeys(e: KeyboardEvent): void {
       if(NOT_ALLOWED_KEYS.includes(e.key)) e.preventDefault()
     },
-    updateCurrentSentence(targetPos) {
+    updateCurrentSentence(targetPos: number): void {
       if (targetPos > this.getSentencesCount) {
         console.log('DONE')
       } else {
         this.setSentencePos(targetPos)
-        this.setSentences(R.splitEvery(this.wordsPerSentence, this.sourceText.split(' ')).map(x => x.join(' ')))
+        this.setSentences(R.splitEvery(this.wordsPerSentence, this.sourceText.split(' ')).map((x: string[]) => x.join(' ')))
         this.currentSentence = this.sentences[this.sentencePos]
       }
     },
-    onClickToogleTyping() {
-      const { userInput } = this.$refs
+    onClickToogleTyping(): void {
+      const { userInput } = this.$refs as { userInput: HTMLInputElement }
       let sentence = this.currentSentence
       this.resetTyping()
       this.setDisableTyping(!this.disableTyping)
@@ -226,17 +232,17 @@ export default {
 
       userInput.removeAttribute('disabled')
       userInput.focus()
-      sentence = this.showCapitalLetters ? sentence : sentence.toLowerCase()
+      sentence = this.showCapitalLetters && sentence ? sentence : sentence?.toLowerCase() || ''
       this.updateViewer(sentence)
-      this.keydownEvent = document.addEventListener('keydown', this.onKeydown)
+      document.addEventListener('keydown', this.onKeydown)
     },
-    onDisableTyping() {
+    onDisableTyping(): void {
       this.setDisableTyping(true)
       this.setMenuOpen(false)
       document.removeEventListener('keydown', this.onKeydown)
     }
   },
-}
+})
 </script>
 <style lang="scss">
 

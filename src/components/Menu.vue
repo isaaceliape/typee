@@ -60,15 +60,15 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, computed } from 'vue'
 import { useStore } from 'vuex'
 import { mapAppState, mapAppMutations } from '../helpers'
-import { computed } from 'vue'
 
 import ToggleButton from './ToggleButton.vue'
 import BurgerMenu from './BurgerMenu.vue'
 
-export default {
+export default defineComponent({
   components: {
     BurgerMenu,
     ToggleButton,
@@ -93,17 +93,17 @@ export default {
       'setDisableTyping',
       'toggleCapitalLetters',
     ], store)
-      
+
     const menuHiddenClass = computed(() => appState.menuOpen.value ? '' : 'hide')
 
     const selectedFontValue = computed({
-      get: () => appState.selectedFont,
-      set: (value) => {
+      get: () => appState.selectedFont.value,
+      set: (value: string) => {
         appMutations.setSelectedFont(value)
       }
     })
 
-    function onClickBurgerMenu() {
+    function onClickBurgerMenu(): void {
       appMutations.toggleMenuOpen()
       if (!appState.disableTyping.value) appMutations.setDisableTyping(true)
     }
@@ -116,7 +116,7 @@ export default {
       selectedFontValue,
     }
   },
-}
+})
 </script>
 
 <style lang="scss" scoped>

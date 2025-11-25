@@ -8,19 +8,21 @@
   <wbr v-if="text === '␣'">
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+export default defineComponent({
   props: {
     text: {
       type: String,
       default: '' ,
     },
     classes: {
-      type: Array,
+      type: Array as () => string[],
       default: () => [],
     }
   }
-}
+})
 </script>
 
 <style lang="scss" scoped>

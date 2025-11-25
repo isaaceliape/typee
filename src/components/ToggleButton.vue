@@ -8,10 +8,10 @@
   </div>
 </template>
 
-<script>
-import { computed } from 'vue'
+<script lang="ts">
+import { defineComponent, computed } from 'vue'
 
-export default {
+export default defineComponent({
   props: {
     active: {
       type: Boolean,
@@ -22,7 +22,7 @@ export default {
   setup(props) {
     return { activeClass: computed(() => props.active ? 'active' : '') }
   }
-}
+})
 </script>
 
 <style lang="scss" scoped>

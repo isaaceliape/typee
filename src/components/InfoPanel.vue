@@ -13,11 +13,12 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import { useStore } from 'vuex'
 import { mapAppState, mapAppGetters, mapAppMutations } from '../helpers'
 
-export default {
+export default defineComponent({
   setup() {
     const store = useStore()
     
@@ -33,7 +34,7 @@ export default {
       ...mapAppMutations(['toggleCapitalLetters'], store)
     }
   }
-}
+})
 </script>
 
 <style lang="scss" scoped>

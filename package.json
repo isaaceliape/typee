@@ -3,17 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "npm run clear_assets & vue-cli-service build --mode production && rsync -va dist/* . && rm -rf dist/",
-    "lint": "vue-cli-service lint",
-    "clear_assets": "sh bin/clear_assets.sh"
+    "dev": "vite",
+    "build": "vite build && npm run copy-assets",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .vue,.js,.ts,.jsx,.tsx",
+    "copy-assets": "sh bin/clear_assets.sh && cp dist/index.html . && cp dist/css/* css/ 2>/dev/null; cp dist/js/* js/ 2>/dev/null; true"
   },
   "dependencies": {
     "core-js": "^3.6.5",
     "es6-promise": "^4.2.8",
     "pascal-case": "^3.1.2",
     "ramda": "^0.27.1",
-    "vue": "^3.1.2",
+    "vue": "^3.5.25",
     "vue-head": "^2.2.0",
     "vue-loader": "^16.2.0",
     "vuex": "^4.0.0",
@@ -21,32 +22,47 @@
     "xml2js": "^0.4.23"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^4.5.13",
-    "@vue/cli-plugin-eslint": "~4.5.13",
-    "@vue/cli-plugin-vuex": "~4.5.0",
-    "@vue/cli-service": "~4.5.13",
+    "@types/node": "^24.10.1",
+    "@types/ramda": "^0.31.1",
+    "@types/xml2js": "^0.4.14",
+    "@typescript-eslint/eslint-plugin": "^8.48.0",
+    "@typescript-eslint/parser": "^8.48.0",
+    "@vitejs/plugin-vue": "^6.0.2",
+    "@vitejs/plugin-vue-jsx": "^5.1.2",
     "@vue/compiler-sfc": "^3.0.0-beta.1",
     "babel-eslint": "^10.1.0",
-    "eslint": "^6.7.2",
+    "eslint": "^8.57.1",
     "eslint-plugin-vue": "^7.0.0-alpha.0",
-    "sass": "^1.29.0",
-    "sass-loader": "^10.1.0"
+    "sass": "^1.94.2",
+    "sass-loader": "^10.1.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.2.4"
   },
   "eslintConfig": {
     "root": true,
     "env": {
+      "browser": true,
+      "es2021": true,
       "node": true
     },
     "extends": [
-      "plugin:vue/recommended",
+      "plugin:vue/vue3-essential",
       "eslint:recommended"
     ],
+    "parser": "vue-eslint-parser",
     "parserOptions": {
-      "parser": "babel-eslint"
+      "ecmaVersion": 2020,
+      "sourceType": "module",
+      "parser": "@typescript-eslint/parser"
     },
+    "plugins": [
+      "vue",
+      "@typescript-eslint"
+    ],
     "rules": {
       "vue/no-v-html": "warn",
-      "vue/no-multiple-template-root": "off"
+      "vue/no-multiple-template-root": "off",
+      "no-unused-vars": "off"
     }
   },
   "browserslist": [
