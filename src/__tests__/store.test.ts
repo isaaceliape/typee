@@ -256,7 +256,7 @@ describe('App Store', () => {
         clear: vi.fn(),
         key: vi.fn(),
         length: 0,
-      } as any
+      } as unknown as Storage
       
       store.toggleDarkMode()
       expect(store.darkMode).toBe(!initialValue)
@@ -277,7 +277,7 @@ describe('App Store', () => {
         clear: vi.fn(),
         key: vi.fn(),
         length: 0,
-      } as any
+      } as unknown as Storage
       
       store.setDarkMode(true)
       expect(store.darkMode).toBe(true)
