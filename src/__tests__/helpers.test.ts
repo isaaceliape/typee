@@ -1,47 +1,50 @@
-import { describe, it, expect } from 'vitest'
-import mutationFactory from '../helpers'
+import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { updateSelectedFont } from '../helpers'
 
 describe('helpers.ts', () => {
-  describe('mutationFactory', () => {
-    it('should create mutation functions for given properties', () => {
-      const mutations = mutationFactory(['testProp', 'anotherProp'])
-      
-      expect(mutations).toBeDefined()
-      expect(mutations['setTestProp']).toBeDefined()
-      expect(mutations['setAnotherProp']).toBeDefined()
+  describe('updateSelectedFont', () => {
+    let styleElement: HTMLElement | null
+
+    beforeEach(() => {
+      // Clean up any existing style elements before each test
+      styleElement = document.querySelector('#selectedFontStyle')
+      if (styleElement) {
+        styleElement.remove()
+      }
     })
 
-    it('should create mutations that set state properties', () => {
-      const mutations = mutationFactory(['count'])
-      const state = { count: 0 }
-      
-      mutations['setCount'](state, 42)
-      
-      expect(state.count).toBe(42)
+    afterEach(() => {
+      // Clean up style element after each test
+      styleElement = document.querySelector('#selectedFontStyle')
+      if (styleElement) {
+        styleElement.remove()
+      }
     })
 
-    it('should handle multiple properties', () => {
-      const mutations = mutationFactory(['a', 'b', 'c'])
-      const state = { a: 1, b: 2, c: 3 }
+    it('should create a style element with the selected font', () => {
+      updateSelectedFont("'Ubuntu Mono', monospace")
       
-      mutations['setA'](state, 10)
-      mutations['setB'](state, 20)
-      mutations['setC'](state, 30)
-      
-      expect(state.a).toBe(10)
-      expect(state.b).toBe(20)
-      expect(state.c).toBe(30)
+      const style = document.querySelector('#selectedFontStyle')
+      expect(style).toBeDefined()
+      expect(style?.textContent).toContain("font-family: 'Ubuntu Mono', monospace")
     })
 
-    it('should handle property names with different cases', () => {
-      const mutations = mutationFactory(['menuOpen', 'selectedFont'])
-      const state = { menuOpen: false, selectedFont: 'Arial' }
+    it('should remove previous font style when updating', () => {
+      updateSelectedFont("'Arial', sans-serif")
+      let styles = document.querySelectorAll('#selectedFontStyle')
+      expect(styles.length).toBe(1)
       
-      mutations['setMenuOpen'](state, true)
-      mutations['setSelectedFont'](state, 'Courier')
+      updateSelectedFont("'Courier', monospace")
+      styles = document.querySelectorAll('#selectedFontStyle')
+      expect(styles.length).toBe(1)
+      expect(document.querySelector('#selectedFontStyle')?.textContent).toContain('Courier')
+    })
+
+    it('should append the style to document head', () => {
+      updateSelectedFont("'Georgia', serif")
       
-      expect(state.menuOpen).toBe(true)
-      expect(state.selectedFont).toBe('Courier')
+      const style = document.querySelector('head #selectedFontStyle')
+      expect(style).toBeDefined()
     })
   })
 })

@@ -1,14 +1,18 @@
 <template>
   <div class="InfoPanel">
     <table>
-      <tr>
-        <th>Errors</th>
-        <th>Sentences</th>
-      </tr>
-      <tr>
-        <td><span class="errors">{{ store.errorCount }}</span></td>
-        <td><span class="errors">{{ store.sentencePos + 1 }} of {{ store.getSentencesCount }}</span></td>
-      </tr>
+      <thead>
+        <tr>
+          <th>Errors</th>
+          <th>Sentences</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="errors">{{ store.errorCount }}</span></td>
+          <td><span class="errors">{{ store.sentencePos + 1 }} of {{ store.getSentencesCount }}</span></td>
+        </tr>
+      </tbody>
     </table>
   </div>
 </template>

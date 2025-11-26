@@ -9,53 +9,54 @@
       :class="menuHiddenClass"
     >
       <table>
-        <tr>
-          <td>Capital letters</td>
-          <td>
-            <ToggleButton
-              :active="store.showCapitalLetters"
-              @on-click-toggle-button="store.toggleCapitalLetters"
-            />
-          </td>
-        </tr>
-        <tr>
-          <td>Text size</td>
-          <td class="fontSizeControler">
-            <span class="currentFontSize">{{ store.fontSize }}</span>
-            <button
-              class="fontSizeControlerButtons"
-              @click="store.increaseFontSize"
-            >
-              +
-            </button>
-            <button
-              class="fontSizeControlerButtons"
-              @click="store.decreaseFontSize"
-            >
-              -
-            </button>
-          </td>
-        </tr>
-        <tr>
-          <td>Font</td>
-          <td>
-            <select v-model="selectedFontValue">
-              <option
-                v-for="{ value, text } in store.fonts"
-                :key="value"
-                :value="value"
-                :selected="value === store.selectedFont ? 'selected' : false"
+        <tbody>
+          <tr>
+            <td>Capital letters</td>
+            <td>
+              <ToggleButton
+                :active="store.showCapitalLetters"
+                @on-click-toggle-button="store.toggleCapitalLetters"
+              />
+            </td>
+          </tr>
+          <tr>
+            <td>Text size</td>
+            <td class="fontSizeControler">
+              <span class="currentFontSize">{{ store.fontSize }}</span>
+              <button
+                class="fontSizeControlerButtons"
+                @click="store.increaseFontSize"
               >
-                {{ text }}
-              </option>
-            </select>
-          </td>
-        </tr>
-         <tr>
-           <td>Words per sentence</td>
-           <td>{{ store.wordsPerSentence }}</td>
-         </tr>
-         <tr>
+                +
+              </button>
+              <button
+                class="fontSizeControlerButtons"
+                @click="store.decreaseFontSize"
+              >
+                -
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>Font</td>
+            <td>
+              <select v-model="selectedFontValue">
+                <option
+                  v-for="{ value, text } in store.fonts"
+                  :key="value"
+                  :value="value"
+                  :selected="value === store.selectedFont ? 'selected' : false"
+                >
+                  {{ text }}
+                </option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>Words per sentence</td>
+            <td>{{ store.wordsPerSentence }}</td>
+          </tr>
+          <tr>
             <td>Dark mode</td>
             <td>
               <ToggleButton
@@ -64,7 +65,8 @@
               />
             </td>
           </tr>
-       </table>
+        </tbody>
+      </table>
      </div>
   </div>
 </template>
