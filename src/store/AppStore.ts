@@ -1,5 +1,5 @@
 import { createStore } from "vuex";
-import mutationFactory from "../helpers.ts";
+import mutationFactory from "../helpers";
 
 export default createStore({
   state: {

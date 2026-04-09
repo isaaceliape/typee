@@ -1,0 +1,7 @@
+[install]
+# Use latest Bun install behavior
+allow-optional-dependencies = true
+
+[test]
+# Use Vitest instead of Bun's native test runner
+root = "."
