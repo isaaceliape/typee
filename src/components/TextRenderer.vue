@@ -29,7 +29,7 @@
         class="viewer"
         :style="{fontSize: `${fontSize}px`, fontFamily: `${selectedFont}`}"
       >
-        <Letter
+        <TypingLetter
           v-for="(letter, i) in finalText"
           :key="i"
           :text="letter.text"
@@ -43,7 +43,7 @@
       />
     </div>
 
-    <Keymap
+    <KeymapOverlay
       v-if="!disableTyping"
       :selected-key="nextLetter"
     />
@@ -61,9 +61,9 @@
 import * as R from 'ramda'
 import { mapState, mapMutations, mapGetters } from 'vuex'
 
-import Letter from './Letter.vue'
+import TypingLetter from './TypingLetter.vue'
 import InfoPanel from './InfoPanel.vue'
-import Keymap from './Keymap.vue'
+import KeymapOverlay from './KeymapOverlay.vue'
 
 import mostCommonEnglishWords from '../assets/1000EnglishWords'
 
@@ -74,8 +74,8 @@ let debounceTimer = null
 export default {
   components: {
     InfoPanel,
-    Letter,
-    Keymap,
+    TypingLetter,
+    KeymapOverlay,
   },
   data() {
     return {

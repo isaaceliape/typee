@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Menu />
+    <AppMenu />
     <TextRenderer />
   </div>
 </template>
@@ -8,12 +8,12 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import TextRenderer from "./components/TextRenderer.vue";
-import Menu from "./components/Menu.vue";
+import AppMenu from "./components/AppMenu.vue";
 
 export default defineComponent({
   name: "App",
   components: {
-    Menu,
+    AppMenu,
     TextRenderer,
   },
 });
